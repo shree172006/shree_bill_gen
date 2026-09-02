@@ -25,28 +25,31 @@ export const StudentTable = ({
   onViewReceipt,
   onEditStudent,
   onDeleteStudent,
+  currentUser,
 }) => {
+  const isSchoolSection = currentUser?.section === 'school';
+  const isCollegeSection = currentUser?.section === 'college';
+
   const getStatusBadge = (status) => {
     switch (status) {
       case 'PAID':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-            <CheckCircle2 className="h-3 w-3 text-emerald-600" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-300 rounded-full">
+            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
             PAID
           </span>
         );
       case 'PARTIAL':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
-            <Clock className="h-3 w-3 text-amber-600" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-amber-800 bg-amber-50 border border-amber-300 rounded-full">
+            <Clock className="h-3.5 w-3.5 text-amber-600" />
             PARTIAL
           </span>
         );
-      case 'PENDING':
       default:
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-red-800 border border-red-300">
-            <AlertCircle className="h-3 w-3 text-red-600" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-red-700 bg-red-50 border border-red-200 rounded-full">
+            <AlertCircle className="h-3.5 w-3.5 text-red-500" />
             PENDING
           </span>
         );
@@ -91,18 +94,28 @@ export const StudentTable = ({
             onChange={(e) => onStandardFilterChange(e.target.value)}
             className="w-full sm:w-auto px-2.5 py-2 text-xs sm:text-sm font-semibold bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-800 shadow-2xs text-slate-700 font-medium"
           >
-            <option value="all">All Standards & Boards</option>
-            <optgroup label="Junior College (Commerce Stream Only)">
-              <option value="SYJC">SYJC (12th Commerce)</option>
-              <option value="FYJC">FYJC (11th Commerce)</option>
-            </optgroup>
-            <optgroup label="School Section (CBSE / ICSE / IGCSE / SSC)">
-              <option value="Class 10">Class 10 (10th)</option>
-              <option value="Class 9">Class 9 (9th)</option>
-              <option value="Class 8">Class 8 (8th)</option>
-              <option value="Class 7">Class 7 (7th)</option>
-              <option value="Class 6">Class 6 (6th)</option>
-            </optgroup>
+            <option value="all">
+              {isSchoolSection
+                ? 'All School Classes (6th-10th)'
+                : isCollegeSection
+                ? 'All Commerce (11th & 12th)'
+                : 'All Standards & Boards'}
+            </option>
+            {!isSchoolSection && (
+              <optgroup label="Junior College (Commerce Stream Only)">
+                <option value="SYJC (12th Commerce)">SYJC (12th Commerce)</option>
+                <option value="FYJC (11th Commerce)">FYJC (11th Commerce)</option>
+              </optgroup>
+            )}
+            {!isCollegeSection && (
+              <optgroup label="School Section (CBSE / ICSE / IGCSE / SSC)">
+                <option value="Class 10">Class 10 (10th)</option>
+                <option value="Class 9">Class 9 (9th)</option>
+                <option value="Class 8">Class 8 (8th)</option>
+                <option value="Class 7">Class 7 (7th)</option>
+                <option value="Class 6">Class 6 (6th)</option>
+              </optgroup>
+            )}
           </select>
         </div>
       </div>

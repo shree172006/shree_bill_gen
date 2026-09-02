@@ -8,13 +8,18 @@ const API = axios.create({
   baseURL: API_BASE,
 });
 
+export const authAPI = {
+  login: (credentials) => API.post('/auth/login', credentials),
+  getSession: () => API.get('/auth/session'),
+};
+
 export const studentAPI = {
   getAll: (params) => API.get('/students', { params }),
   getById: (id) => API.get(`/students/${id}`),
   create: (data) => API.post('/students', data),
   update: (id, data) => API.put(`/students/${id}`, data),
   delete: (id) => API.delete(`/students/${id}`),
-  getStats: () => API.get('/students/stats'),
+  getStats: (params) => API.get('/students/stats', { params }),
 };
 
 export const excelAPI = {

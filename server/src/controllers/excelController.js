@@ -1,6 +1,7 @@
 import * as XLSX from 'xlsx';
 import { v4 as uuidv4 } from 'uuid';
 import { Store } from '../models/store.js';
+import { isMatchingSection } from './studentController.js';
 
 // Format Date helper
 const formatDateVal = (dateStr) => {
@@ -258,9 +259,12 @@ export const uploadExcel = async (req, res) => {
  */
 export const exportStudents = (req, res) => {
   const students = Store.getStudents();
-  const { status, standard } = req.query;
+  const { status, standard, section } = req.query;
 
   let list = [...students];
+  if (section && section !== 'all') {
+    list = list.filter((s) => isMatchingSection(s.standard, section));
+  }
   if (status && status !== 'all') {
     list = list.filter((s) => s.status?.toUpperCase() === status.toUpperCase());
   }

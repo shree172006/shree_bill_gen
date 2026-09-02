@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import studentRoutes from './routes/studentRoutes.js';
 import excelRoutes from './routes/excelRoutes.js';
 import settingRoutes from './routes/settingRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 import { connectDB } from './config/db.js';
 import { testSupabaseConnection } from './config/supabase.js';
 
@@ -33,6 +34,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // API Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/excel', excelRoutes);
 app.use('/api/settings', settingRoutes);

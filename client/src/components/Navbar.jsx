@@ -9,6 +9,8 @@ import {
   CheckCircle2,
   X,
   Share,
+  LogOut,
+  User,
 } from 'lucide-react';
 
 export const Navbar = ({
@@ -17,6 +19,8 @@ export const Navbar = ({
   onExportExcel,
   onOpenSettings,
   settings,
+  currentUser,
+  onLogout,
 }) => {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [isInstalled, setIsInstalled] = useState(false);
@@ -86,12 +90,16 @@ export const Navbar = ({
                   </span>
                 </div>
                 <p className="text-[10px] sm:text-xs text-slate-500 font-medium truncate max-w-[160px] sm:max-w-xs md:max-w-md">
-                  {settings?.tagline || 'Automated Billing & Fee Receipt Console'}
+                  {currentUser?.section === 'school'
+                    ? '🏫 School Section (Classes 6th - 10th)'
+                    : currentUser?.section === 'college'
+                    ? '🎓 Commerce Section (11th & 12th FYJC/SYJC)'
+                    : settings?.tagline || 'Automated Billing & Fee Receipt Console'}
                 </p>
               </div>
             </div>
 
-            {/* Action Buttons */}
+            {/* Action Buttons & User Profile */}
             <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
               {/* PWA Install Button */}
               {!isInstalled && (
@@ -125,14 +133,16 @@ export const Navbar = ({
                 <span className="hidden lg:inline">Export</span>
               </button>
 
-              {/* Settings */}
-              <button
-                onClick={onOpenSettings}
-                className="p-1.5 sm:p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors border border-transparent hover:border-slate-200 active:scale-95"
-                title="Institute Settings"
-              >
-                <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
-              </button>
+              {/* Settings (Admin / Director) */}
+              {currentUser?.role === 'admin' && (
+                <button
+                  onClick={onOpenSettings}
+                  className="p-1.5 sm:p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors border border-transparent hover:border-slate-200 active:scale-95"
+                  title="Institute Settings"
+                >
+                  <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
+                </button>
+              )}
 
               {/* New Student Admission Button */}
               <button
@@ -142,6 +152,33 @@ export const Navbar = ({
                 <PlusCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-400" />
                 <span className="inline">New <span className="hidden sm:inline">Student</span></span>
               </button>
+
+              {/* Teacher Profile & Logout */}
+              {currentUser && (
+                <div className="flex items-center pl-1 sm:pl-2 border-l border-slate-200 gap-1.5 sm:gap-2">
+                  <div className="hidden sm:flex flex-col text-right">
+                    <span className="text-xs font-bold text-slate-900 leading-tight">
+                      {currentUser.name}
+                    </span>
+                    <span className="text-[10px] text-blue-800 font-semibold">
+                      {currentUser.section === 'school'
+                        ? '6th - 10th'
+                        : currentUser.section === 'college'
+                        ? '11th & 12th'
+                        : 'Admin'}
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={onLogout}
+                    className="inline-flex items-center gap-1 p-1.5 sm:px-2.5 sm:py-1.5 text-xs font-bold text-red-700 hover:text-red-800 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-all active:scale-95"
+                    title="Sign Out of Teacher Portal"
+                  >
+                    <LogOut className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Logout</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

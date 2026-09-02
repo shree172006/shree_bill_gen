@@ -8,9 +8,20 @@ import { ExcelImportModal } from './components/ExcelImportModal';
 import { SettingsModal } from './components/SettingsModal';
 import { ConfirmModal } from './components/ConfirmModal';
 import { Toast } from './components/Toast';
+import { LoginScreen } from './components/LoginScreen';
 import { studentAPI, excelAPI, settingAPI } from './services/api';
 
 export function App() {
+  // Persistent Auth State
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('shree_auth_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch (_) {
+      return null;
+    }
+  });
+
   const [students, setStudents] = useState([]);
   const [stats, setStats] = useState(null);
   const [settings, setSettings] = useState(null);
@@ -37,10 +48,22 @@ export function App() {
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
-    loadAllData();
-  }, []);
+    if (currentUser) {
+      loadAllData();
+    } else {
+      loadSettingsOnly();
+    }
+  }, [currentUser]);
+
+  const loadSettingsOnly = async () => {
+    try {
+      const settingsRes = await settingAPI.get();
+      if (settingsRes.data?.success) setSettings(settingsRes.data.data);
+    } catch (_) {}
+  };
 
   const loadAllData = async () => {
+    if (!currentUser) return;
     setLoading(true);
     try {
       const [studentsRes, statsRes, settingsRes] = await Promise.all([
@@ -48,8 +71,9 @@ export function App() {
           search: searchTerm,
           status: statusFilter,
           standard: standardFilter,
+          section: currentUser.section || 'all',
         }),
-        studentAPI.getStats(),
+        studentAPI.getStats({ section: currentUser.section || 'all' }),
         settingAPI.get(),
       ]);
 
@@ -58,26 +82,25 @@ export function App() {
       if (settingsRes.data?.success) setSettings(settingsRes.data.data);
     } catch (err) {
       console.error('Data load error:', err);
-      setToast({
-        title: 'Connection Notice',
-        message: 'Loaded data from local cache.',
-        type: 'info',
-      });
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadStudents();
+    if (currentUser) {
+      loadStudents();
+    }
   }, [searchTerm, statusFilter, standardFilter]);
 
   const loadStudents = async () => {
+    if (!currentUser) return;
     try {
       const res = await studentAPI.getAll({
         search: searchTerm,
         status: statusFilter,
         standard: standardFilter,
+        section: currentUser.section || 'all',
       });
       if (res.data?.success) {
         setStudents(res.data.data);
@@ -85,6 +108,30 @@ export function App() {
     } catch (err) {
       console.error('Error fetching students:', err);
     }
+  };
+
+  const handleLoginSuccess = (user, token) => {
+    localStorage.setItem('shree_auth_user', JSON.stringify(user));
+    if (token) localStorage.setItem('shree_auth_token', token);
+    setCurrentUser(user);
+    setToast({
+      title: `Welcome, ${user.name}!`,
+      message: `Signed in as ${user.title}`,
+      type: 'success',
+    });
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('shree_auth_user');
+    localStorage.removeItem('shree_auth_token');
+    setCurrentUser(null);
+    setStudents([]);
+    setStats(null);
+    setToast({
+      title: 'Logged Out',
+      message: 'You have been signed out successfully.',
+      type: 'info',
+    });
   };
 
   const handleSaveStudent = async (studentData) => {
@@ -171,6 +218,7 @@ export function App() {
       const res = await excelAPI.exportStudents({
         status: statusFilter,
         standard: standardFilter,
+        section: currentUser?.section || 'all',
       });
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
@@ -193,6 +241,16 @@ export function App() {
     }
   };
 
+  // If not authenticated, render Login Screen
+  if (!currentUser) {
+    return (
+      <>
+        <Toast toast={toast} onClose={() => setToast(null)} />
+        <LoginScreen onLoginSuccess={handleLoginSuccess} settings={settings} />
+      </>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       {/* Toast Notification Container */}
@@ -201,6 +259,8 @@ export function App() {
       {/* Top Navbar */}
       <Navbar
         settings={settings}
+        currentUser={currentUser}
+        onLogout={handleLogout}
         onNewStudent={() => {
           setSelectedStudent(null);
           setIsStudentModalOpen(true);
@@ -225,6 +285,7 @@ export function App() {
           onStatusFilterChange={setStatusFilter}
           standardFilter={standardFilter}
           onStandardFilterChange={setStandardFilter}
+          currentUser={currentUser}
           onViewReceipt={(student) => {
             setSelectedStudent(student);
             setIsReceiptModalOpen(true);
@@ -244,7 +305,7 @@ export function App() {
       <footer className="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500 font-medium px-4">
         <p>© {new Date().getFullYear()} {settings?.instituteName || 'Shree Sai Classes'}. All rights reserved.</p>
         <p className="text-[11px] text-slate-400 mt-1">
-          Automated Billing, Multi-Installment Tracking & PDF Fee Receipt Management Suite
+          Logged in as <strong>{currentUser.name}</strong> ({currentUser.title})
         </p>
       </footer>
 
@@ -269,6 +330,7 @@ export function App() {
         }}
         onSave={handleSaveStudent}
         student={selectedStudent}
+        currentUser={currentUser}
       />
 
       <ReceiptModal
@@ -294,12 +356,14 @@ export function App() {
         }}
       />
 
-      <SettingsModal
-        isOpen={isSettingsModalOpen}
-        onClose={() => setIsSettingsModalOpen(false)}
-        settings={settings}
-        onSaveSettings={handleSaveSettings}
-      />
+      {currentUser?.role === 'admin' && (
+        <SettingsModal
+          isOpen={isSettingsModalOpen}
+          onClose={() => setIsSettingsModalOpen(false)}
+          settings={settings}
+          onSaveSettings={handleSaveSettings}
+        />
+      )}
     </div>
   );
 }

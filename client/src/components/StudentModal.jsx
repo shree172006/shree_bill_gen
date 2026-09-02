@@ -3,18 +3,31 @@ import { X, Plus, Trash2 } from 'lucide-react';
 import { DateInput } from './DateInput';
 import { formatCurrency } from '../utils/formatters';
 
-export const StudentModal = ({ isOpen, onClose, onSave, student }) => {
+export const StudentModal = ({ isOpen, onClose, onSave, student, currentUser }) => {
+  const isSchoolSection = currentUser?.section === 'school';
+  const isCollegeSection = currentUser?.section === 'college';
+
+  const defaultStandard = isSchoolSection
+    ? 'Class 10'
+    : isCollegeSection
+    ? 'SYJC (12th Commerce)'
+    : 'SYJC (12th Commerce)';
+
+  const defaultCourse = isSchoolSection
+    ? 'Class 10 - CBSE / ICSE / SSC (All Subjects Package)'
+    : 'SYJC - COMMERCE (BK, Accounts, Maths, Eco, OCM)';
+
   const [formData, setFormData] = useState({
     studentName: '',
     rollNo: '',
     contactNo: '',
     parentContact: '',
-    standard: 'SYJC (12th Commerce)',
-    board: 'HSC',
-    courseName: 'SYJC - COMMERCE (BK, Accounts, Maths, Eco, OCM)',
+    standard: defaultStandard,
+    board: isCollegeSection ? 'HSC' : 'CBSE',
+    courseName: defaultCourse,
     academicYear: '2024-25',
     admissionDate: new Date().toISOString().split('T')[0],
-    totalFees: 45000,
+    totalFees: isSchoolSection ? 35000 : 45000,
     discount: 0,
     installments: [],
     notes: '',
@@ -35,11 +48,12 @@ export const StudentModal = ({ isOpen, onClose, onSave, student }) => {
         rollNo: '',
         contactNo: '',
         parentContact: '',
-        standard: 'SYJC',
-        courseName: 'SYJC - COMMERCE (2024-25)',
+        standard: defaultStandard,
+        board: isCollegeSection ? 'HSC' : 'CBSE',
+        courseName: defaultCourse,
         academicYear: '2024-25',
         admissionDate: today,
-        totalFees: 45000,
+        totalFees: isSchoolSection ? 35000 : 45000,
         discount: 0,
         installments: [
           {
@@ -226,35 +240,45 @@ export const StudentModal = ({ isOpen, onClose, onSave, student }) => {
                   }}
                   className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-800 focus:outline-none font-medium"
                 >
-                  <optgroup label="Junior College (Commerce Stream Only)">
-                    <option value="SYJC (12th Commerce)">SYJC (12th Commerce)</option>
-                    <option value="FYJC (11th Commerce)">FYJC (11th Commerce)</option>
-                  </optgroup>
-                  <optgroup label="Secondary & High School (6th to 10th)">
-                    <option value="Class 10">Class 10 (10th)</option>
-                    <option value="Class 9">Class 9 (9th)</option>
-                    <option value="Class 8">Class 8 (8th)</option>
-                    <option value="Class 7">Class 7 (7th)</option>
-                    <option value="Class 6">Class 6 (6th)</option>
-                  </optgroup>
+                  {!isSchoolSection && (
+                    <optgroup label="Junior College (Commerce Stream Only)">
+                      <option value="SYJC (12th Commerce)">SYJC (12th Commerce)</option>
+                      <option value="FYJC (11th Commerce)">FYJC (11th Commerce)</option>
+                    </optgroup>
+                  )}
+                  {!isCollegeSection && (
+                    <optgroup label="Secondary & High School (6th to 10th)">
+                      <option value="Class 10">Class 10 (10th)</option>
+                      <option value="Class 9">Class 9 (9th)</option>
+                      <option value="Class 8">Class 8 (8th)</option>
+                      <option value="Class 7">Class 7 (7th)</option>
+                      <option value="Class 6">Class 6 (6th)</option>
+                    </optgroup>
+                  )}
                 </select>
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Education Board</label>
                 <select
-                  value={formData.board || 'CBSE'}
+                  value={formData.board || (isCollegeSection ? 'HSC' : 'CBSE')}
                   onChange={(e) => {
                     const board = e.target.value;
                     setFormData({ ...formData, board });
                   }}
                   className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-800 focus:outline-none font-medium"
                 >
-                  <option value="CBSE">CBSE Board</option>
-                  <option value="ICSE">ICSE Board</option>
-                  <option value="IGCSE">IGCSE (Cambridge)</option>
-                  <option value="SSC">SSC (Maharashtra State Board)</option>
-                  <option value="HSC">HSC (Commerce - Maharashtra Board)</option>
+                  {!isCollegeSection && (
+                    <>
+                      <option value="CBSE">CBSE Board</option>
+                      <option value="ICSE">ICSE Board</option>
+                      <option value="IGCSE">IGCSE (Cambridge)</option>
+                      <option value="SSC">SSC (Maharashtra State Board)</option>
+                    </>
+                  )}
+                  {!isSchoolSection && (
+                    <option value="HSC">HSC (Commerce - Maharashtra Board)</option>
+                  )}
                 </select>
               </div>
 

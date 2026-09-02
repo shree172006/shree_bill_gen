@@ -1,11 +1,46 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Store } from '../models/store.js';
 
+// Section filtering helper
+export const isMatchingSection = (standard = '', section = 'all') => {
+  if (!section || section === 'all') return true;
+  const std = standard.toLowerCase();
+  if (section === 'school') {
+    return (
+      std.includes('class 6') ||
+      std.includes('class 7') ||
+      std.includes('class 8') ||
+      std.includes('class 9') ||
+      std.includes('class 10') ||
+      std.includes('6th') ||
+      std.includes('7th') ||
+      std.includes('8th') ||
+      std.includes('9th') ||
+      std.includes('10th')
+    );
+  }
+  if (section === 'college') {
+    return (
+      std.includes('fyjc') ||
+      std.includes('syjc') ||
+      std.includes('11th') ||
+      std.includes('12th') ||
+      std.includes('commerce')
+    );
+  }
+  return true;
+};
+
 export const getStudents = async (req, res) => {
   const students = await Store.fetchStudentsAsync();
-  const { search, status, standard } = req.query;
+  const { search, status, standard, section } = req.query;
 
   let filtered = [...students];
+
+  // Role / Section-Based Filter
+  if (section && section !== 'all') {
+    filtered = filtered.filter((s) => isMatchingSection(s.standard, section));
+  }
 
   if (search) {
     const q = search.toLowerCase().trim();
@@ -55,8 +90,9 @@ export const createStudent = async (req, res) => {
     contactNo: req.body.contactNo || '',
     parentContact: req.body.parentContact || '',
     academicYear: req.body.academicYear || `${year}-${String(year + 1).slice(2)}`,
-    standard: req.body.standard || 'SYJC',
-    courseName: req.body.courseName || 'SYJC - COMMERCE',
+    standard: req.body.standard || 'SYJC (12th Commerce)',
+    board: req.body.board || 'CBSE',
+    courseName: req.body.courseName || `${req.body.standard || 'SYJC'} Course Package`,
     admissionDate: req.body.admissionDate || now.toISOString().split('T')[0],
     feesDate: req.body.feesDate || now.toISOString().split('T')[0],
     reportDate: req.body.reportDate || now.toISOString().split('T')[0],
@@ -101,7 +137,13 @@ export const deleteStudent = async (req, res) => {
 };
 
 export const getStats = async (req, res) => {
-  const students = await Store.fetchStudentsAsync();
+  const { section } = req.query;
+  let students = await Store.fetchStudentsAsync();
+
+  if (section && section !== 'all') {
+    students = students.filter((s) => isMatchingSection(s.standard, section));
+  }
+
   const totalRevenue = students.reduce((acc, s) => acc + (s.grandTotal || 0), 0);
   const totalCollected = students.reduce((acc, s) => acc + (s.totalPaid || 0), 0);
   const totalBalance = students.reduce((acc, s) => acc + (s.balanceLeft || 0), 0);
