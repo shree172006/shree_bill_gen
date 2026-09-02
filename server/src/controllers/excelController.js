@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
 import { v4 as uuidv4 } from 'uuid';
-import { Store } from '../models/store.js';
+import { Store, normalizeExcelDate, normalizeStandard, normalizeCourseName } from '../models/store.js';
 import { isMatchingSection } from './studentController.js';
 
 // Format Date helper with Excel serial number support
@@ -170,13 +170,26 @@ export const uploadExcel = async (req, res) => {
         getField(row, ['Reg No.', 'Reg No', 'Receipt No', 'Receipt No.']) ||
         `SSC-REC-${now.getFullYear()}-${String(students.length + idx + 1).padStart(3, '0')}`;
 
-      const standard = getField(row, ['Std', 'Standard', 'Class', 'Standard / Class']) || 'SYJC (12th Commerce)';
-      const admissionDate = getField(row, ['Date Of Admission', 'Admission Date']) || todayStr;
+      const rawStd = getField(row, ['Std', 'Standard', 'Class', 'Standard / Class']);
+      const standard = normalizeStandard(rawStd);
+      const isCollege = standard.includes('SYJC') || standard.includes('FYJC');
+      const board = isCollege ? 'HSC' : 'CBSE';
+      const courseName = normalizeCourseName(standard, getField(row, ['Course', 'Course Name', 'Package']));
+
+      const rawAdmDate = getField(row, ['Date Of Admission', 'Admission Date']);
+      const admissionDate = normalizeExcelDate(rawAdmDate) || todayStr;
+
+      const contactNo = String(getField(row, ['Contact No', 'Contact No.', 'Student Mobile', 'Mobile', 'Phone', 'Contact']) || '').trim();
+      const parentContact = String(getField(row, ['Parent Mobile', 'Parent Contact', 'Father Contact', 'Mother Contact', 'Parents Contact']) || '').trim();
+
+      const academicYear = getField(row, ['Academic Year', 'Year', 'Batch', 'Session']) || `${now.getFullYear()}-${String(now.getFullYear() + 1).slice(-2)}`;
+
       const yearlyFees = parseFloat(getField(row, ['Yearly Fees', 'Total Fees', 'Fees']) || 0);
       const actualFees = parseFloat(getField(row, ['Actual Fees', 'Grand Total', 'Net Fees']) || yearlyFees);
       const discount = Math.max(0, yearlyFees - actualFees);
       const remark = getField(row, ['REMARK', 'Remark', 'Notes', 'Note']);
-      const dueDateVal = getField(row, ['DUE DATE', 'Due Date']);
+      const rawDueDate = getField(row, ['DUE DATE', 'Due Date']);
+      const dueDateVal = normalizeExcelDate(rawDueDate);
 
       // Extract up to 5 installments from parent payments columns
       const installments = [];
@@ -184,15 +197,16 @@ export const uploadExcel = async (req, res) => {
         const receivedAmt = parseFloat(
           getField(row, [`RECEIVED FROM PARENTS ${i}`, `RECEIVED ${i}`, `PARENTS ${i}`]) || 0
         );
-        const receivedDate = getField(row, [`RECEIVED DATE ${i}`, `RECEIVED DATE`, `DATE ${i}`]) || todayStr;
+        const rawRecDate = getField(row, [`RECEIVED DATE ${i}`, `RECEIVED DATE`, `DATE ${i}`]);
+        const receivedDate = normalizeExcelDate(rawRecDate) || todayStr;
         const receiptNoInst = getField(row, [`RECEIPT NO. ${i}`, `RECEIPT NO`, `RECEIPT ${i}`]) || `${regNo}-0${i}`;
         const mode = getField(row, [`Mode Of Payment ${i}`, `Mode Of Payment`, `Mode ${i}`]) || 'Cash';
 
         if (receivedAmt > 0) {
           installments.push({
             srNo: i,
-            dueDate: receivedDate || todayStr,
-            paidDate: receivedDate || todayStr,
+            dueDate: receivedDate,
+            paidDate: receivedDate,
             status: 'PAID',
             amount: receivedAmt,
             paymentMode: mode,
@@ -222,14 +236,13 @@ export const uploadExcel = async (req, res) => {
         receiptNo: regNo,
         studentName,
         rollNo: regNo,
-        contactNo: '',
-        parentContact: '',
-        academicYear: `${now.getFullYear()}-${String(now.getFullYear() + 1).slice(-2)}`,
+        contactNo,
+        parentContact,
+        academicYear,
         standard,
-        courseName: `${standard} Package`,
-        admissionDate: typeof admissionDate === 'string' && admissionDate.includes('/')
-          ? admissionDate.split('/').reverse().join('-')
-          : admissionDate || todayStr,
+        board,
+        courseName,
+        admissionDate,
         feesDate: todayStr,
         reportDate: todayStr,
         totalFees: yearlyFees > 0 ? yearlyFees : actualFees,

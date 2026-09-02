@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { Calendar } from 'lucide-react';
+import { parseAnyDateToISO } from '../utils/formatters';
 
 export const DateInput = ({
   value,
@@ -10,19 +11,24 @@ export const DateInput = ({
 }) => {
   const hiddenDateInputRef = useRef(null);
 
+  // Normalize incoming value to ISO YYYY-MM-DD
+  const isoDate = parseAnyDateToISO(value);
+
   // Convert YYYY-MM-DD to DD/MM/YYYY for display
-  const toDisplayDate = (isoStr) => {
-    if (!isoStr) return '';
+  const toDisplayDate = (val) => {
+    if (!val) return '';
+    const iso = parseAnyDateToISO(val);
+    if (!iso) return '';
     try {
-      const parts = isoStr.split('-');
+      const parts = iso.split('-');
       if (parts.length === 3) {
         return `${parts[2]}/${parts[1]}/${parts[0]}`;
       }
     } catch (_) {}
-    return isoStr;
+    return iso;
   };
 
-  // Convert DD/MM/YYYY to YYYY-MM-DD
+  // Convert typed DD/MM/YYYY to YYYY-MM-DD
   const handleTextChange = (e) => {
     const text = e.target.value;
     const match = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
@@ -32,7 +38,6 @@ export const DateInput = ({
       const year = match[3];
       onChange(`${year}-${month}-${day}`);
     } else {
-      // Allow raw input while typing
       if (!text) onChange('');
     }
   };
@@ -79,7 +84,7 @@ export const DateInput = ({
       <input
         ref={hiddenDateInputRef}
         type="date"
-        value={value || ''}
+        value={isoDate || ''}
         onChange={handleNativeDateSelect}
         className="sr-only absolute pointer-events-none opacity-0"
         tabIndex={-1}

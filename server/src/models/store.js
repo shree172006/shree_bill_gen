@@ -31,29 +31,119 @@ const DEFAULT_SETTINGS = {
   ],
 };
 
+export const normalizeExcelDate = (val) => {
+  if (!val || val === '-') return '';
+  const num = Number(val);
+  if (!isNaN(num) && num > 30000 && num < 65000) {
+    const excelEpoch = new Date(Date.UTC(1899, 11, 30));
+    const jsDate = new Date(excelEpoch.getTime() + num * 86400000);
+    const y = jsDate.getUTCFullYear();
+    const m = String(jsDate.getUTCMonth() + 1).padStart(2, '0');
+    const d = String(jsDate.getUTCDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+  if (typeof val === 'string') {
+    const trimmed = val.trim();
+    if (/^\d{5}$/.test(trimmed)) {
+      const n = parseInt(trimmed, 10);
+      const excelEpoch = new Date(Date.UTC(1899, 11, 30));
+      const jsDate = new Date(excelEpoch.getTime() + n * 86400000);
+      const y = jsDate.getUTCFullYear();
+      const m = String(jsDate.getUTCMonth() + 1).padStart(2, '0');
+      const d = String(jsDate.getUTCDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+    if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(trimmed)) {
+      const [d, m, y] = trimmed.split('/');
+      return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+    }
+    if (/^\d{4}-\d{2}-\d{2}/.test(trimmed)) {
+      return trimmed.split('T')[0];
+    }
+  }
+  return String(val);
+};
+
+export const normalizeStandard = (rawStd = '') => {
+  if (!rawStd) return 'Class 10';
+  const s = String(rawStd).trim();
+  const lower = s.toLowerCase();
+
+  if (lower === 'x' || lower === '10' || lower === '10th' || lower === 'class 10' || lower.includes('10th') || lower.includes('class 10')) {
+    return 'Class 10';
+  }
+  if (lower === 'ix' || lower === '9' || lower === '9th' || lower === 'class 9' || lower.includes('9th') || lower.includes('class 9')) {
+    return 'Class 9';
+  }
+  if (lower === 'viii' || lower === '8' || lower === '8th' || lower === 'class 8' || lower.includes('8th') || lower.includes('class 8')) {
+    return 'Class 8';
+  }
+  if (lower === 'vii' || lower === '7' || lower === '7th' || lower === 'class 7' || lower.includes('7th') || lower.includes('class 7')) {
+    return 'Class 7';
+  }
+  if (lower === 'vi' || lower === '6' || lower === '6th' || lower === 'class 6' || lower.includes('6th') || lower.includes('class 6')) {
+    return 'Class 6';
+  }
+  if (lower === 'xii' || lower === '12' || lower === '12th' || lower.includes('syjc') || lower.includes('12th')) {
+    return 'SYJC (12th Commerce)';
+  }
+  if (lower === 'xi' || lower === '11' || lower === '11th' || lower.includes('fyjc') || lower.includes('11th')) {
+    return 'FYJC (11th Commerce)';
+  }
+  return s;
+};
+
+export const normalizeCourseName = (standard, courseName) => {
+  if (courseName && !courseName.toLowerCase().endsWith('package') && !courseName.toLowerCase().includes('package')) {
+    return courseName;
+  }
+  if (standard.includes('SYJC')) {
+    return 'SYJC - COMMERCE (BK, Accounts, Maths, Eco, OCM)';
+  }
+  if (standard.includes('FYJC')) {
+    return 'FYJC - COMMERCE (BK, Accounts, Maths, Eco, OCM)';
+  }
+  return `${standard} - CBSE / ICSE / SSC (Maths & Science Package)`;
+};
+
 // Field Mapping Helpers between camelCase (App) and snake_case (Supabase)
-const toAppStudent = (dbRow) => ({
-  id: dbRow.id,
-  receiptNo: dbRow.receipt_no || dbRow.receiptNo,
-  studentName: dbRow.student_name || dbRow.studentName,
-  standard: dbRow.standard || 'SYJC (12th Commerce)',
-  board: dbRow.board || 'CBSE',
-  courseName: dbRow.course_name || dbRow.courseName,
-  academicYear: dbRow.academic_year || dbRow.academicYear || '2024-25',
-  contactNo: dbRow.contact_no || dbRow.contactNo || '',
-  parentContact: dbRow.parent_contact || dbRow.parentContact || '',
-  admissionDate: dbRow.admission_date || dbRow.admissionDate,
-  feesDate: dbRow.fees_date || dbRow.feesDate,
-  reportDate: dbRow.report_date || dbRow.reportDate,
-  totalFees: parseFloat(dbRow.total_fees || dbRow.totalFees || 0),
-  discount: parseFloat(dbRow.discount || 0),
-  grandTotal: parseFloat(dbRow.grand_total || dbRow.grandTotal || 0),
-  totalPaid: parseFloat(dbRow.total_paid || dbRow.totalPaid || 0),
-  balanceLeft: parseFloat(dbRow.balance_left || dbRow.balanceLeft || 0),
-  status: dbRow.status || 'PENDING',
-  installments: dbRow.installments || [],
-  notes: dbRow.notes || '',
-});
+const toAppStudent = (dbRow) => {
+  const standard = normalizeStandard(dbRow.standard || 'Class 10');
+  const isCollege = standard.includes('SYJC') || standard.includes('FYJC');
+  const board = dbRow.board || (isCollege ? 'HSC' : 'CBSE');
+  const courseName = normalizeCourseName(standard, dbRow.course_name || dbRow.courseName);
+  const admissionDate = normalizeExcelDate(dbRow.admission_date || dbRow.admissionDate);
+  const feesDate = normalizeExcelDate(dbRow.fees_date || dbRow.feesDate);
+  const reportDate = normalizeExcelDate(dbRow.report_date || dbRow.reportDate);
+  const installments = (dbRow.installments || []).map((inst) => ({
+    ...inst,
+    dueDate: normalizeExcelDate(inst.dueDate),
+    paidDate: normalizeExcelDate(inst.paidDate),
+  }));
+
+  return {
+    id: dbRow.id,
+    receiptNo: dbRow.receipt_no || dbRow.receiptNo,
+    studentName: dbRow.student_name || dbRow.studentName,
+    standard,
+    board,
+    courseName,
+    academicYear: dbRow.academic_year || dbRow.academicYear || '2026-27',
+    contactNo: dbRow.contact_no || dbRow.contactNo || '',
+    parentContact: dbRow.parent_contact || dbRow.parentContact || '',
+    admissionDate,
+    feesDate,
+    reportDate,
+    totalFees: parseFloat(dbRow.total_fees || dbRow.totalFees || 0),
+    discount: parseFloat(dbRow.discount || 0),
+    grandTotal: parseFloat(dbRow.grand_total || dbRow.grandTotal || 0),
+    totalPaid: parseFloat(dbRow.total_paid || dbRow.totalPaid || 0),
+    balanceLeft: parseFloat(dbRow.balance_left || dbRow.balanceLeft || 0),
+    status: dbRow.status || 'PENDING',
+    installments,
+    notes: dbRow.notes || '',
+  };
+};
 
 const toDbStudent = (appStudent) => ({
   id: appStudent.id,

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus, Trash2 } from 'lucide-react';
 import { DateInput } from './DateInput';
-import { formatCurrency } from '../utils/formatters';
+import { formatCurrency, parseAnyDateToISO, normalizeStandard, normalizeCourseName } from '../utils/formatters';
 
 export const StudentModal = ({ isOpen, onClose, onSave, student, currentUser }) => {
   const isSchoolSection = currentUser?.section === 'school';
@@ -25,7 +25,7 @@ export const StudentModal = ({ isOpen, onClose, onSave, student, currentUser }) 
     standard: defaultStandard,
     board: isCollegeSection ? 'HSC' : 'CBSE',
     courseName: defaultCourse,
-    academicYear: '2024-25',
+    academicYear: '2026-27',
     admissionDate: new Date().toISOString().split('T')[0],
     totalFees: isSchoolSection ? 35000 : 45000,
     discount: 0,
@@ -37,9 +37,24 @@ export const StudentModal = ({ isOpen, onClose, onSave, student, currentUser }) 
 
   useEffect(() => {
     if (student) {
+      const std = normalizeStandard(student.standard);
+      const crs = normalizeCourseName(std, student.courseName);
+      const isCollege = std.includes('SYJC') || std.includes('FYJC');
+      const brd = student.board || (isCollege ? 'HSC' : 'CBSE');
+      const adm = parseAnyDateToISO(student.admissionDate);
+      const insts = (student.installments || []).map((i) => ({
+        ...i,
+        dueDate: parseAnyDateToISO(i.dueDate),
+        paidDate: parseAnyDateToISO(i.paidDate),
+      }));
+
       setFormData({
         ...student,
-        installments: student.installments || [],
+        standard: std,
+        board: brd,
+        courseName: crs,
+        admissionDate: adm,
+        installments: insts,
       });
     } else {
       const today = new Date().toISOString().split('T')[0];
@@ -228,15 +243,9 @@ export const StudentModal = ({ isOpen, onClose, onSave, student, currentUser }) 
                   value={formData.standard}
                   onChange={(e) => {
                     const std = e.target.value;
-                    let autoCourse = formData.courseName;
-                    if (std.includes('SYJC')) {
-                      autoCourse = 'SYJC - COMMERCE (BK, Accounts, Maths, Eco, OCM)';
-                    } else if (std.includes('FYJC')) {
-                      autoCourse = 'FYJC - COMMERCE (BK, Accounts, Maths, Eco, OCM)';
-                    } else {
-                      autoCourse = `${std} - CBSE / ICSE / SSC (Maths & Science Package)`;
-                    }
-                    setFormData({ ...formData, standard: std, courseName: autoCourse });
+                    const autoCourse = normalizeCourseName(std);
+                    const autoBoard = std.includes('SYJC') || std.includes('FYJC') ? 'HSC' : 'CBSE';
+                    setFormData({ ...formData, standard: std, courseName: autoCourse, board: autoBoard });
                   }}
                   className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-800 focus:outline-none font-medium"
                 >

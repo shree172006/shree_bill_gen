@@ -1,32 +1,16 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Store } from '../models/store.js';
+import { Store, normalizeStandard } from '../models/store.js';
 
 // Section filtering helper
-export const isMatchingSection = (standard = '', section = 'all') => {
+export const isMatchingSection = (rawStd = '', section = 'all') => {
   if (!section || section === 'all') return true;
+  const standard = normalizeStandard(rawStd);
   const std = standard.toLowerCase();
   if (section === 'school') {
-    return (
-      std.includes('class 6') ||
-      std.includes('class 7') ||
-      std.includes('class 8') ||
-      std.includes('class 9') ||
-      std.includes('class 10') ||
-      std.includes('6th') ||
-      std.includes('7th') ||
-      std.includes('8th') ||
-      std.includes('9th') ||
-      std.includes('10th')
-    );
+    return std.includes('class');
   }
   if (section === 'college') {
-    return (
-      std.includes('fyjc') ||
-      std.includes('syjc') ||
-      std.includes('11th') ||
-      std.includes('12th') ||
-      std.includes('commerce')
-    );
+    return std.includes('fyjc') || std.includes('syjc') || std.includes('commerce');
   }
   return true;
 };
