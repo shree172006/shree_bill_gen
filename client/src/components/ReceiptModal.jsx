@@ -69,130 +69,125 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Segoe UI',Arial,sans-serif;background:#fff;color:#1e293b;font-size:12px;line-height:1.4}
-  h1{font-size:22px;font-weight:900;color:#172554;letter-spacing:-0.5px}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#fff;color:#0f172a;font-size:12px;line-height:1.45}
 </style>
 </head>
-<body style="padding:28px 32px;width:800px">
-  <!-- Header -->
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #172554;padding-bottom:14px;margin-bottom:14px">
+<body style="padding:28px 32px;width:800px;background:#ffffff">
+  <!-- Institute Header Banner -->
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #1e3a8a;padding-bottom:14px;margin-bottom:16px">
     <div style="display:flex;align-items:flex-start;gap:14px">
-      <div style="width:60px;height:60px;background:#ffffff;border-radius:10px;border:2px solid #dc2626;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;padding:2px">
+      <div style="width:62px;height:62px;background:#ffffff;border-radius:12px;border:2px solid #dc2626;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;padding:2px">
         <img src="${window.location.origin}/logo.png" alt="Shree Sai Classes" style="width:100%;height:100%;object-fit:contain" />
       </div>
       <div>
-        <h1>${instituteName}</h1>
+        <h1 style="font-size:22px;font-weight:900;color:#1e3a8a;letter-spacing:-0.5px;line-height:1.15">${instituteName}</h1>
         <p style="font-size:11px;font-weight:700;color:#dc2626;margin-top:3px">${tagline}</p>
-        <p style="font-size:10px;color:#64748b;margin-top:3px">${address}</p>
-        <p style="font-size:10px;font-weight:600;color:#475569;margin-top:2px">Student's Care No.: ${phone}</p>
+        <p style="font-size:10px;color:#64748b;margin-top:2px">${address}</p>
+        <p style="font-size:10px;font-weight:600;color:#334155;margin-top:2px">Student's Care No.: ${phone}</p>
       </div>
     </div>
     <div style="text-align:right;flex-shrink:0">
-      <div style="background:#dc2626;color:#fff;font-weight:900;font-size:11px;letter-spacing:1px;padding:4px 10px;border-radius:4px;text-transform:uppercase">FEE RECEIPT</div>
-      <p style="font-size:12px;font-weight:700;font-family:monospace;color:#172554;margin-top:5px">${activeReceiptNo}</p>
+      <div style="background:#dc2626;color:#ffffff;font-weight:900;font-size:11px;letter-spacing:1px;padding:4px 12px;border-radius:4px;display:inline-block;text-transform:uppercase">FEE RECEIPT</div>
+      <p style="font-size:13px;font-weight:800;font-family:monospace;color:#1e3a8a;margin-top:4px">${activeReceiptNo}</p>
+      <p style="font-size:10px;font-weight:600;color:#64748b;margin-top:2px">Date: ${todayStr}</p>
     </div>
   </div>
 
-  <!-- Dates -->
-  <div style="display:flex;justify-content:space-between;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 14px;margin-bottom:14px;font-size:11px;color:#475569">
-    <div><span>Admission Date: </span><strong style="color:#1e293b">${admDate}</strong></div>
-    <div><span>Receipt Issue Date: </span><strong style="color:#1e293b">${todayStr}</strong></div>
-  </div>
+  <!-- Student Particulars (Clean 4-Column Structured Table) -->
+  <table style="width:100%;border-collapse:collapse;margin-bottom:16px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden">
+    <tr>
+      <td style="padding:8px 12px;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;width:18%;border-bottom:1px solid #e2e8f0">Student Full Name</td>
+      <td style="padding:8px 12px;font-size:13px;font-weight:900;color:#1e3a8a;width:32%;border-bottom:1px solid #e2e8f0">${student.studentName}</td>
+      <td style="padding:8px 12px;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;width:18%;border-bottom:1px solid #e2e8f0">Standard / Class</td>
+      <td style="padding:8px 12px;font-size:12px;font-weight:800;color:#dc2626;width:32%;border-bottom:1px solid #e2e8f0">${student.standard}</td>
+    </tr>
+    <tr>
+      <td style="padding:8px 12px;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;border-bottom:1px solid #e2e8f0">Reg. / Roll No.</td>
+      <td style="padding:8px 12px;font-size:11px;font-weight:700;font-family:monospace;color:#1e293b;border-bottom:1px solid #e2e8f0">${student.receiptNo || '—'}</td>
+      <td style="padding:8px 12px;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;border-bottom:1px solid #e2e8f0">Academic Year</td>
+      <td style="padding:8px 12px;font-size:11px;font-weight:700;color:#1e293b;border-bottom:1px solid #e2e8f0">${student.academicYear || '2026-27'}</td>
+    </tr>
+    <tr>
+      <td style="padding:8px 12px;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;border-bottom:1px solid #e2e8f0">Father Contact No</td>
+      <td style="padding:8px 12px;font-size:11px;font-weight:700;color:#1e293b;border-bottom:1px solid #e2e8f0">${student.fatherContact || student.contactNo || '—'}</td>
+      <td style="padding:8px 12px;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;border-bottom:1px solid #e2e8f0">Mother Contact No</td>
+      <td style="padding:8px 12px;font-size:11px;font-weight:700;color:#1e293b;border-bottom:1px solid #e2e8f0">${student.motherContact || student.parentContact || '—'}</td>
+    </tr>
+    <tr>
+      <td style="padding:8px 12px;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase">Date of Admission</td>
+      <td style="padding:8px 12px;font-size:11px;font-weight:700;color:#1e293b">${admDate}</td>
+      <td style="padding:8px 12px;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase">Receipt Issue Date</td>
+      <td style="padding:8px 12px;font-size:11px;font-weight:700;color:#1e293b">${todayStr}</td>
+    </tr>
+  </table>
 
-  <!-- Student Details -->
-  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:14px">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div>
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;margin-bottom:2px">Student Full Name</div>
-        <div style="font-size:13px;font-weight:900;color:#172554">${student.studentName}</div>
-      </div>
-      <div>
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;margin-bottom:2px">Academic Year</div>
-        <div style="font-size:12px;font-weight:700;color:#1e293b">${student.academicYear || '2026-27'}</div>
-      </div>
-      <div>
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;margin-bottom:2px">Standard / Class</div>
-        <div style="display:inline-block;background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700">${student.standard}</div>
-      </div>
-      <div>
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;margin-bottom:2px">Father Contact No</div>
-        <div style="font-size:12px;font-weight:700;color:#1e293b">${student.fatherContact || student.contactNo || '-'}</div>
-      </div>
-      <div>
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;margin-bottom:2px">Mother Contact No</div>
-        <div style="font-size:12px;font-weight:700;color:#1e293b">${student.motherContact || student.parentContact || '-'}</div>
-      </div>
-      <div>
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;margin-bottom:2px">Course &amp; Subject Package</div>
-        <div style="font-size:12px;font-weight:700;color:#1e293b">${student.courseName}</div>
-      </div>
-    </div>
-  </div>
+  <!-- Fee Particulars & Cleared Payment Receipts Ledger -->
+  <table style="width:100%;border-collapse:collapse;margin-bottom:16px;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden">
+    <thead>
+      <tr style="background:#1e3a8a;color:#ffffff">
+        <th style="padding:9px 12px;text-align:left;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px">Fee Particular / Cleared Installment</th>
+        <th style="padding:9px 12px;text-align:left;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px">Receipt No.</th>
+        <th style="padding:9px 12px;text-align:left;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px">Date</th>
+        <th style="padding:9px 12px;text-align:left;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px">Mode</th>
+        <th style="padding:9px 12px;text-align:right;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px">Amount (₹)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Base Course Fee Structure -->
+      <tr style="background:#f8fafc">
+        <td style="padding:8px 12px;font-size:11px;font-weight:700;color:#334155;border-bottom:1px solid #e2e8f0">Total Course Tuition Fees</td>
+        <td style="padding:8px 12px;font-size:11px;color:#94a3b8;border-bottom:1px solid #e2e8f0">—</td>
+        <td style="padding:8px 12px;font-size:11px;color:#94a3b8;border-bottom:1px solid #e2e8f0">—</td>
+        <td style="padding:8px 12px;font-size:11px;color:#94a3b8;border-bottom:1px solid #e2e8f0">—</td>
+        <td style="padding:8px 12px;font-size:11px;font-weight:800;color:#0f172a;text-align:right;border-bottom:1px solid #e2e8f0">${formatCurrency(student.totalFees)}</td>
+      </tr>
+      ${student.discount > 0 ? `
+      <tr style="background:#f0fdf4">
+        <td style="padding:8px 12px;font-size:11px;font-weight:700;color:#059669;border-bottom:1px solid #e2e8f0">Less: Special Scholarship / Fee Concession</td>
+        <td style="padding:8px 12px;font-size:11px;color:#94a3b8;border-bottom:1px solid #e2e8f0">—</td>
+        <td style="padding:8px 12px;font-size:11px;color:#94a3b8;border-bottom:1px solid #e2e8f0">—</td>
+        <td style="padding:8px 12px;font-size:11px;color:#94a3b8;border-bottom:1px solid #e2e8f0">—</td>
+        <td style="padding:8px 12px;font-size:11px;font-weight:800;color:#059669;text-align:right;border-bottom:1px solid #e2e8f0">- ${formatCurrency(student.discount)}</td>
+      </tr>` : ''}
+      <tr style="background:#f1f5f9">
+        <td colspan="4" style="padding:8px 12px;font-size:11px;font-weight:800;color:#1e3a8a;border-bottom:2px solid #cbd5e1">Net Total Payable Course Fees</td>
+        <td style="padding:8px 12px;font-size:12px;font-weight:900;color:#1e3a8a;text-align:right;border-bottom:2px solid #cbd5e1">${formatCurrency(student.grandTotal)}</td>
+      </tr>
+      <!-- Cleared Installment Rows Header -->
+      <tr style="background:#e2e8f0">
+        <td colspan="5" style="padding:6px 12px;font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:#334155;border-bottom:1px solid #cbd5e1">Installments Paid &amp; Cleared (${inst.length} Cleared)</td>
+      </tr>
+      ${rowsHTML}
+    </tbody>
+  </table>
 
-  <!-- Fee Particulars -->
-  <div style="margin-bottom:14px">
-    <div style="background:#172554;color:#fff;padding:8px 12px;border-radius:8px 8px 0 0;display:flex;justify-content:space-between;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px">
-      <span>Fee Particulars</span><span>Amount (₹)</span>
-    </div>
-    <div style="border:1px solid #e2e8f0;border-top:none;border-radius:0 0 8px 8px;overflow:hidden">
-      <div style="display:flex;justify-content:space-between;padding:9px 12px;border-bottom:1px solid #f1f5f9">
-        <span style="font-size:11px;color:#475569">Course Tuition &amp; Study Material Fees</span>
-        <span style="font-size:11px;font-weight:700;color:#1e293b">${formatCurrency(student.totalFees)}</span>
-      </div>
-      ${discountRow}
-      <div style="display:flex;justify-content:space-between;padding:9px 12px;background:#f1f5f9">
-        <span style="font-size:11px;font-weight:700;color:#1e293b">Net Payable Grand Total</span>
-        <span style="font-size:13px;font-weight:900;color:#172554">${formatCurrency(student.grandTotal)}</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Payment Table -->
-  <div style="margin-bottom:14px">
-    <div style="background:#1e293b;color:#fff;padding:8px 12px;border-radius:8px 8px 0 0;display:flex;justify-content:space-between;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px">
-      <span>Payment &amp; Receipts Breakdown</span>
-      <span style="color:#6ee7b7;font-size:10px">${inst.length} Cleared</span>
-    </div>
-    <div style="border:1px solid #e2e8f0;border-top:none;border-radius:0 0 8px 8px;overflow:hidden">
-      <table style="width:100%;border-collapse:collapse">
-        <thead>
-          <tr style="background:#f1f5f9">
-            <th style="padding:7px 10px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;border-bottom:1px solid #e2e8f0">Installment</th>
-            <th style="padding:7px 10px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;border-bottom:1px solid #e2e8f0">Receipt No.</th>
-            <th style="padding:7px 10px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;border-bottom:1px solid #e2e8f0">Payment Date</th>
-            <th style="padding:7px 10px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;border-bottom:1px solid #e2e8f0">Payment Mode</th>
-            <th style="padding:7px 10px;text-align:right;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;border-bottom:1px solid #e2e8f0">Amount Paid</th>
-          </tr>
-        </thead>
-        <tbody>${rowsHTML}</tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Balance Summary -->
-  <div style="display:flex;justify-content:space-between;background:linear-gradient(to right,#eff6ff,#fff,#fef2f2);border:1px solid #cbd5e1;border-radius:10px;padding:14px 18px;margin-bottom:14px">
-    <div>
-      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;margin-bottom:3px">Total Fees Collected</div>
-      <div style="font-size:20px;font-weight:900;color:#15803d">${formatCurrency(student.totalPaid)}</div>
-    </div>
-    <div style="text-align:right">
-      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;margin-bottom:3px">Outstanding Balance Due</div>
-      <div style="font-size:20px;font-weight:900;color:${student.balanceLeft > 0 ? '#b91c1c' : '#15803d'}">${formatCurrency(student.balanceLeft)}</div>
-    </div>
-  </div>
-
-  <!-- Terms -->
-  <div style="border-top:1px solid #e2e8f0;padding-top:10px;margin-bottom:18px">
-    <p style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#475569;margin-bottom:4px">Terms &amp; Conditions:</p>
-    ${terms.map(t => `<p style="font-size:9px;color:#64748b;line-height:1.5">${t}</p>`).join('')}
-  </div>
-
-  <!-- Signature -->
-  <div style="display:flex;justify-content:flex-end;border-top:1px dashed #cbd5e1;padding-top:14px">
+  <!-- Financial Balance Strip (3 Columns) -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:8px;padding:12px 18px;margin-bottom:16px">
     <div style="text-align:center">
-      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#172554;margin-bottom:32px">For ${instituteName}</div>
-      <div style="width:160px;border-bottom:1px solid #94a3b8;margin-bottom:5px"></div>
-      <div style="font-size:10px;font-weight:700;color:#475569">Authorized Signatory</div>
+      <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;margin-bottom:2px">Net Payable Fees</div>
+      <div style="font-size:16px;font-weight:900;color:#1e293b">${formatCurrency(student.grandTotal)}</div>
+    </div>
+    <div style="text-align:center;border-left:1px solid #cbd5e1;border-right:1px solid #cbd5e1">
+      <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#059669;margin-bottom:2px">Total Fees Collected</div>
+      <div style="font-size:18px;font-weight:900;color:#15803d">${formatCurrency(student.totalPaid)}</div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:${student.balanceLeft > 0 ? '#b91c1c' : '#059669'};margin-bottom:2px">Outstanding Balance Due</div>
+      <div style="font-size:18px;font-weight:900;color:${student.balanceLeft > 0 ? '#b91c1c' : '#15803d'}">${student.balanceLeft > 0 ? formatCurrency(student.balanceLeft) : 'NIL (FULLY CLEARED)'}</div>
+    </div>
+  </div>
+
+  <!-- Terms & Signatures -->
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:16px;padding-top:12px;border-top:1px dashed #cbd5e1">
+    <div style="max-width:440px">
+      <p style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:#475569;margin-bottom:3px">Terms &amp; Conditions:</p>
+      ${terms.map(t => `<p style="font-size:8.5px;color:#64748b;line-height:1.4">${t}</p>`).join('')}
+      <p style="font-size:8.5px;color:#94a3b8;font-style:italic;margin-top:4px">This is a verified official fee receipt issued by Shree Sai Classes.</p>
+    </div>
+    <div style="text-align:center;min-width:180px">
+      <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#1e3a8a;margin-bottom:36px">For ${instituteName}</div>
+      <div style="width:160px;border-bottom:1.5px solid #64748b;margin:0 auto 4px"></div>
+      <div style="font-size:10px;font-weight:800;color:#334155">Authorized Signatory</div>
     </div>
   </div>
 </body>
@@ -445,7 +440,6 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
                   </p>
                 </div>
               </div>
-
               <div className="text-right shrink-0">
                 <span className="inline-block px-2.5 py-0.5 bg-red-600 text-white font-black text-[11px] uppercase tracking-wider rounded">
                   FEE RECEIPT
@@ -453,158 +447,140 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
                 <p className="text-xs font-mono font-bold text-blue-950 mt-1">
                   {activeReceiptNo}
                 </p>
+                <p className="text-[10px] text-slate-500 font-medium mt-0.5">
+                  Date: {formatDate(new Date())}
+                </p>
               </div>
             </div>
 
-            {/* Receipt Meta Date Header */}
-            <div className="flex items-center justify-between text-[11px] text-slate-600 mb-3 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
-              <div>
-                <span className="text-slate-500">Admission Date: </span>
-                <span className="font-bold text-slate-800">{formatDate(student.admissionDate)}</span>
-              </div>
-              <div>
-                <span className="text-slate-500">Receipt Issue Date: </span>
-                <span className="font-bold text-slate-800">{formatDate(new Date())}</span>
-              </div>
+            {/* Student Particulars (Clean 4-Column Structured Table) */}
+            <div className="bg-slate-50 rounded-xl border border-slate-200 mb-3.5 overflow-hidden">
+              <table className="w-full text-xs">
+                <tbody>
+                  <tr className="border-b border-slate-200">
+                    <td className="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-[20%]">Student Full Name</td>
+                    <td className="px-3 py-2 font-black text-blue-950 text-xs w-[30%]">{student.studentName}</td>
+                    <td className="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-[20%]">Standard / Class</td>
+                    <td className="px-3 py-2 font-bold text-red-600 text-xs w-[30%]">{student.standard}</td>
+                  </tr>
+                  <tr className="border-b border-slate-200">
+                    <td className="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Reg. / Roll No.</td>
+                    <td className="px-3 py-2 font-mono font-bold text-slate-800 text-xs">{student.receiptNo || '—'}</td>
+                    <td className="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Academic Year</td>
+                    <td className="px-3 py-2 font-bold text-slate-800 text-xs">{student.academicYear || '2026-27'}</td>
+                  </tr>
+                  <tr className="border-b border-slate-200">
+                    <td className="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Father Contact</td>
+                    <td className="px-3 py-2 font-bold text-slate-800 text-xs">{student.fatherContact || student.contactNo || '—'}</td>
+                    <td className="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Mother Contact</td>
+                    <td className="px-3 py-2 font-bold text-slate-800 text-xs">{student.motherContact || student.parentContact || '—'}</td>
+                  </tr>
+                  <tr>
+                    <td className="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Admission Date</td>
+                    <td className="px-3 py-2 font-bold text-slate-800 text-xs">{formatDate(student.admissionDate)}</td>
+                    <td className="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Receipt Issue Date</td>
+                    <td className="px-3 py-2 font-bold text-slate-800 text-xs">{formatDate(new Date())}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
 
-            {/* Student & Course Details Grid */}
-            <div className="bg-slate-50 rounded-xl p-3 border border-slate-200 mb-3.5">
-              <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-xs">
-                <div>
-                  <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-500">Student Full Name</span>
-                  <span className="text-xs font-black text-blue-950">{student.studentName}</span>
-                </div>
-
-                <div>
-                  <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-500">Academic Year</span>
-                  <span className="font-bold text-slate-900 text-xs">{student.academicYear || '2026-27'}</span>
-                </div>
-
-                <div>
-                  <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-500">Standard / Class</span>
-                  <span className="font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded border border-red-200 inline-block text-[11px]">
-                    {student.standard}
-                  </span>
-                </div>
-
-                <div>
-                  <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-500">Father Contact No</span>
-                  <span className="font-bold text-slate-900 text-xs">{student.fatherContact || student.contactNo || '-'}</span>
-                </div>
-
-                <div>
-                  <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-500">Mother Contact No</span>
-                  <span className="font-bold text-slate-900 text-xs">{student.motherContact || student.parentContact || '-'}</span>
-                </div>
-
-                <div>
-                  <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-500">Course & Subject Package</span>
-                  <span className="font-bold text-slate-900 text-xs">{student.courseName}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Financial Breakdown Table */}
-            <div className="mb-3.5">
-              <div className="bg-blue-950 text-white px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-t-lg flex justify-between">
-                <span>Fee Particulars</span>
-                <span>Amount (₹)</span>
-              </div>
-              <div className="border-x border-b border-slate-200 divide-y divide-slate-100 text-xs rounded-b-lg overflow-hidden bg-white">
-                <div className="flex justify-between px-3 py-2">
-                  <span className="font-medium text-slate-700">Course Tuition & Study Material Fees</span>
-                  <span className="font-bold text-slate-900">{formatCurrency(student.totalFees)}</span>
-                </div>
-                {student.discount > 0 && (
-                  <div className="flex justify-between px-3 py-1.5 bg-emerald-50/60">
-                    <span className="font-semibold text-emerald-800">Special Scholarship / Discount Concession</span>
-                    <span className="font-bold text-emerald-700">- {formatCurrency(student.discount)}</span>
-                  </div>
-                )}
-                <div className="flex justify-between px-3 py-2 bg-slate-100 font-bold text-slate-900">
-                  <span>Net Payable Grand Total</span>
-                  <span className="text-xs font-black text-blue-950">{formatCurrency(student.grandTotal)}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Paid Installments Payment Table (ONLY PAID RECORDS) */}
-            <div className="mb-3.5">
-              <div className="bg-slate-800 text-white px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-t-lg flex justify-between items-center">
-                <span>Payment & Receipts Breakdown</span>
-                <span className="text-[10px] text-emerald-300 font-semibold flex items-center gap-1">
-                  <CheckCircle2 className="h-3 w-3" />
-                  {paidInstallments.length} Cleared
-                </span>
-              </div>
-              <div className="border-x border-b border-slate-200 rounded-b-lg overflow-hidden bg-white">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-100 text-[9px] font-bold text-slate-600 uppercase border-b border-slate-200">
-                    <tr>
-                      <th className="px-3 py-1.5">Installment</th>
-                      <th className="px-3 py-1.5">Receipt No.</th>
-                      <th className="px-3 py-1.5">Payment Date</th>
-                      <th className="px-3 py-1.5">Payment Mode</th>
-                      <th className="px-3 py-1.5 text-right">Amount Paid</th>
+            {/* Unified Fee Structure & Payments Breakdown Table */}
+            <div className="border border-slate-200 rounded-xl overflow-hidden mb-3.5 bg-white shadow-xs">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="bg-blue-950 text-white text-[9px] font-bold uppercase tracking-wider">
+                    <th className="px-3 py-2">Particulars / Payment Details</th>
+                    <th className="px-3 py-2">Receipt No.</th>
+                    <th className="px-3 py-2">Date</th>
+                    <th className="px-3 py-2">Mode</th>
+                    <th className="px-3 py-2 text-right">Amount (₹)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  <tr className="bg-slate-50/70">
+                    <td className="px-3 py-1.5 font-bold text-slate-700">Total Course Tuition Fees</td>
+                    <td className="px-3 py-1.5 text-slate-400">—</td>
+                    <td className="px-3 py-1.5 text-slate-400">—</td>
+                    <td className="px-3 py-1.5 text-slate-400">—</td>
+                    <td className="px-3 py-1.5 text-right font-black text-slate-900">{formatCurrency(student.totalFees)}</td>
+                  </tr>
+                  {student.discount > 0 && (
+                    <tr className="bg-emerald-50/50">
+                      <td className="px-3 py-1.5 font-bold text-emerald-800">Less: Special Scholarship / Fee Concession</td>
+                      <td className="px-3 py-1.5 text-slate-400">—</td>
+                      <td className="px-3 py-1.5 text-slate-400">—</td>
+                      <td className="px-3 py-1.5 text-slate-400">—</td>
+                      <td className="px-3 py-1.5 text-right font-bold text-emerald-700">- {formatCurrency(student.discount)}</td>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {paidInstallments.length > 0 ? (
-                      paidInstallments.map((inst, idx) => {
-                        const sNo = inst.srNo || idx + 1;
-                        const instRecNo = inst.receiptNo || `${student.receiptNo}-${String(sNo).padStart(2, '0')}`;
-                        return (
-                          <tr key={idx} className="bg-emerald-50/30">
-                            <td className="px-3 py-1.5 font-bold text-slate-800">
-                              Installment
-                            </td>
-                            <td className="px-3 py-1.5 font-mono font-bold text-blue-950 text-[10px]">
-                              {instRecNo}
-                            </td>
-                            <td className="px-3 py-1.5 text-slate-700 font-medium text-[11px]">
-                              {formatDate(inst.paidDate || inst.dueDate)}
-                            </td>
-                            <td className="px-3 py-1.5 text-slate-800 font-semibold text-[11px]">
-                              {inst.paymentMode || 'Cash'}
-                              {inst.transactionDetails && inst.transactionDetails !== 'Cash' && inst.transactionDetails !== 'Counter Payment' && (
-                                <span className="block text-[9px] text-slate-500 font-normal">
-                                  {inst.transactionDetails}
-                                </span>
-                              )}
-                            </td>
-                            <td className="px-3 py-1.5 text-right font-black text-emerald-700">
-                              {formatCurrency(inst.amount)}
-                            </td>
-                          </tr>
-                        );
-                      })
-                    ) : (
-                      <tr>
-                        <td colSpan={5} className="px-3 py-3 text-center text-slate-400 font-medium italic text-[11px]">
-                          No payments cleared yet.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                  )}
+                  <tr className="bg-slate-100 font-bold border-b-2 border-slate-300">
+                    <td colSpan={4} className="px-3 py-1.5 text-blue-950 font-black">Net Total Payable Course Fees</td>
+                    <td className="px-3 py-1.5 text-right text-blue-950 font-black text-xs">{formatCurrency(student.grandTotal)}</td>
+                  </tr>
+                  <tr className="bg-slate-200/80">
+                    <td colSpan={5} className="px-3 py-1 text-[9px] font-black uppercase tracking-wider text-slate-700">
+                      Cleared Installment Payments ({paidInstallments.length} Cleared)
+                    </td>
+                  </tr>
+                  {paidInstallments.length > 0 ? (
+                    paidInstallments.map((inst, idx) => {
+                      const sNo = inst.srNo || idx + 1;
+                      const instRecNo = inst.receiptNo || `${student.receiptNo}-${String(sNo).padStart(2, '0')}`;
+                      return (
+                        <tr key={idx} className="bg-emerald-50/30">
+                          <td className="px-3 py-1.5 font-bold text-slate-800">
+                            Installment
+                          </td>
+                          <td className="px-3 py-1.5 font-mono font-bold text-blue-950 text-[10px]">
+                            {instRecNo}
+                          </td>
+                          <td className="px-3 py-1.5 text-slate-700 font-medium text-[11px]">
+                            {formatDate(inst.paidDate || inst.dueDate)}
+                          </td>
+                          <td className="px-3 py-1.5 text-slate-800 font-semibold text-[11px]">
+                            {inst.paymentMode || 'Cash'}
+                            {inst.transactionDetails && inst.transactionDetails !== 'Cash' && inst.transactionDetails !== 'Counter Payment' && (
+                              <span className="block text-[9px] text-slate-500 font-normal">
+                                {inst.transactionDetails}
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-3 py-1.5 text-right font-black text-emerald-700">
+                            {formatCurrency(inst.amount)}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    <tr>
+                      <td colSpan={5} className="px-3 py-3 text-center text-slate-400 font-medium italic text-[11px]">
+                        No payments cleared yet.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
 
-            {/* Total Collected & Outstanding Balance Due Box */}
-            <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-3 rounded-xl border border-slate-300 flex items-center justify-between mb-3.5 text-xs">
+            {/* Financial Balance Strip (3 Columns) */}
+            <div className="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-300 text-center mb-3.5 text-xs">
               <div>
-                <span className="block text-[10px] font-bold uppercase text-slate-500">Total Fees Collected</span>
-                <span className="text-base font-black text-emerald-700">{formatCurrency(student.totalPaid)}</span>
+                <span className="block text-[9.5px] font-bold uppercase tracking-wider text-slate-500">Net Payable Fees</span>
+                <span className="text-sm sm:text-base font-black text-slate-900">{formatCurrency(student.grandTotal)}</span>
               </div>
-              <div className="text-right">
-                <span className="block text-[10px] font-bold uppercase text-slate-500">Outstanding Balance Due</span>
+              <div className="border-x border-slate-200 px-2">
+                <span className="block text-[9.5px] font-bold uppercase tracking-wider text-emerald-600">Total Fees Collected</span>
+                <span className="text-sm sm:text-base font-black text-emerald-700">{formatCurrency(student.totalPaid)}</span>
+              </div>
+              <div>
+                <span className="block text-[9.5px] font-bold uppercase tracking-wider text-red-500">Outstanding Balance Due</span>
                 <span
-                  className={`text-base font-black ${
+                  className={`text-sm sm:text-base font-black ${
                     student.balanceLeft > 0 ? 'text-red-700' : 'text-emerald-600'
                   }`}
                 >
-                  {formatCurrency(student.balanceLeft)}
+                  {student.balanceLeft > 0 ? formatCurrency(student.balanceLeft) : 'NIL (CLEARED)'}
                 </span>
               </div>
             </div>
