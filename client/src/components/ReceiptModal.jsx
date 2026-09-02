@@ -351,18 +351,21 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto print:p-0 print:bg-white print:static">
-      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[96vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in duration-150 my-auto print:max-w-none print:max-h-none print:shadow-none print:border-none print:rounded-none">
+    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-hidden print:p-0 print:bg-white print:static">
+      <div className="bg-white rounded-t-3xl sm:rounded-2xl max-w-2xl w-full h-[94vh] sm:h-auto sm:max-h-[96vh] flex flex-col shadow-2xl border-0 sm:border border-slate-200 overflow-hidden animate-in slide-in-from-bottom-6 sm:slide-in-from-bottom-0 sm:fade-in sm:zoom-in duration-200 my-0 sm:my-auto print:max-w-none print:max-h-none print:shadow-none print:border-none print:rounded-none">
+        {/* Mobile Pull Indicator (Phones only) */}
+        <div className="sm:hidden w-10 h-1 bg-slate-300 rounded-full mx-auto mt-2.5 mb-1 shrink-0" />
+
         {/* Modal Controls Header (Hidden on Print) */}
-        <div className="px-4 sm:px-6 py-3 border-b border-slate-200 bg-slate-100 flex items-center justify-between no-print shrink-0">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-800 text-xs sm:text-sm">Fee Receipt Preview</span>
-            <span className="text-[11px] font-mono font-bold text-blue-900 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+        <div className="px-3 sm:px-6 py-2.5 sm:py-3 border-b border-slate-200 bg-slate-100 flex items-center justify-between no-print shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+            <span className="font-bold text-slate-800 text-xs sm:text-sm truncate">Fee Receipt</span>
+            <span className="text-[10px] sm:text-[11px] font-mono font-bold text-blue-900 bg-blue-50 px-1.5 sm:px-2 py-0.5 rounded border border-blue-200 shrink-0">
               {activeReceiptNo}
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Share PDF anywhere (WhatsApp, Telegram, Email, Drive, AirDrop, etc.) */}
             <button
               onClick={handleSharePDF}
@@ -375,14 +378,14 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
               ) : (
                 <Share2 className="h-3.5 w-3.5" />
               )}
-              <span>Share PDF</span>
+              <span className="inline">Share</span>
             </button>
 
-            {/* Save PDF */}
+            {/* Save PDF (Desktop & Tablet) */}
             <button
               onClick={handleDownloadPDF}
               disabled={isGenerating}
-              className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 text-xs font-bold text-blue-900 bg-blue-100 hover:bg-blue-200 border border-blue-300 rounded-lg transition-colors active:scale-95 disabled:opacity-50"
+              className="hidden sm:inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 text-xs font-bold text-blue-900 bg-blue-100 hover:bg-blue-200 border border-blue-300 rounded-lg transition-colors active:scale-95 disabled:opacity-50"
               title="Download PDF Receipt"
             >
               {isGenerating ? (
@@ -390,204 +393,222 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
               ) : (
                 <Download className="h-3.5 w-3.5" />
               )}
-              <span className="hidden sm:inline">Save PDF</span>
+              <span>Save PDF</span>
             </button>
 
-            {/* Print */}
+            {/* Print (Desktop & Tablet) */}
             <button
               onClick={handlePrint}
-              className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 text-xs font-bold text-white bg-blue-900 hover:bg-blue-800 rounded-lg transition-colors shadow-2xs active:scale-95"
+              className="hidden sm:inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 text-xs font-bold text-white bg-blue-900 hover:bg-blue-800 rounded-lg transition-colors shadow-2xs active:scale-95"
               title="Print Receipt"
             >
               <Printer className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Print</span>
+              <span>Print</span>
             </button>
 
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-200 transition-colors ml-1 active:scale-95"
+              className="p-1 sm:p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-200 transition-colors ml-0.5 active:scale-95"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
         </div>
 
-        {/* Printable Receipt Paper Container */}
-        <div className="p-3 sm:p-5 overflow-y-auto bg-slate-100 flex-1 print:p-0 print:bg-white print:overflow-visible">
+        {/* Printable Receipt Paper Container (Smooth scroll on phone) */}
+        <div className="p-2 sm:p-5 overflow-y-auto bg-slate-100 flex-1 print:p-0 print:bg-white print:overflow-visible">
           <div
             id="printable-receipt"
             ref={receiptRef}
-            className="bg-white max-w-xl mx-auto p-4 sm:p-6 rounded-xl border border-slate-300 shadow-md font-['Plus_Jakarta_Sans',sans-serif] text-slate-800 relative text-xs print:border-none print:shadow-none print:max-w-none print:p-0"
+            className="bg-white max-w-xl mx-auto p-3.5 sm:p-6 rounded-2xl border border-slate-300 shadow-sm font-['Plus_Jakarta_Sans',sans-serif] text-slate-800 relative text-xs print:border-none print:shadow-none print:max-w-none print:p-0"
           >
             {/* Academy Crest & Header Banner */}
-            <div className="flex items-start justify-between border-b-2 border-blue-950 pb-3 mb-3 gap-3">
-              <div className="flex items-start gap-3">
-                <div className="h-14 w-14 rounded-xl bg-white p-1 flex items-center justify-center border-2 border-red-600 shadow-sm shrink-0 overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between border-b-2 border-blue-950 pb-3 mb-3 gap-2.5 sm:gap-3">
+              <div className="flex items-center sm:items-start gap-2.5 sm:gap-3">
+                <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-xl bg-white p-1 flex items-center justify-center border-2 border-red-600 shadow-sm shrink-0 overflow-hidden">
                   <img src="/logo.png" alt="Shree Sai Classes" className="h-full w-full object-contain" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-black text-blue-950 font-heading tracking-tight leading-none">
+                  <h1 className="text-base sm:text-xl font-black text-blue-950 font-heading tracking-tight leading-tight">
                     {settings?.instituteName || 'SHREE SAI CLASSES'}
                   </h1>
-                  <p className="text-[11px] font-bold text-red-600 mt-0.5">
+                  <p className="text-[10px] sm:text-[11px] font-bold text-red-600 mt-0.5">
                     {settings?.tagline || 'A Choice of Better Life...! | Hard Work + Quality = Success'}
                   </p>
-                  <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">
+                  <p className="text-[9px] sm:text-[10px] text-slate-500 mt-0.5 leading-tight">
                     {settings?.address || 'Shiv Dham Society No. 5, Opp. BMC Colony, M. D. Nagar, Nallasopara (E)'}
                   </p>
-                  <p className="text-[10px] text-slate-600 font-semibold mt-0.5">
-                    Student's Care No.: {settings?.phone || '+91 7378756695 / +91 7378756653'}
+                  <p className="text-[9px] sm:text-[10px] text-slate-600 font-semibold mt-0.5">
+                    Student's Care: {settings?.phone || '+91 7378756695 / +91 7378756653'}
                   </p>
                 </div>
               </div>
-              <div className="text-right shrink-0">
-                <span className="inline-block px-2.5 py-0.5 bg-red-600 text-white font-black text-[11px] uppercase tracking-wider rounded">
+
+              <div className="flex sm:flex-col justify-between items-center sm:items-end border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100 shrink-0">
+                <span className="inline-block px-2 sm:px-2.5 py-0.5 bg-red-600 text-white font-black text-[10px] sm:text-[11px] uppercase tracking-wider rounded">
                   FEE RECEIPT
                 </span>
-                <p className="text-xs font-mono font-bold text-blue-950 mt-1">
-                  {activeReceiptNo}
-                </p>
-                <p className="text-[10px] text-slate-500 font-medium mt-0.5">
-                  Date: {formatDate(new Date())}
-                </p>
+                <div className="text-right">
+                  <p className="text-xs font-mono font-bold text-blue-950 sm:mt-1">
+                    {activeReceiptNo}
+                  </p>
+                  <p className="text-[9.5px] sm:text-[10px] text-slate-500 font-medium">
+                    Date: {formatDate(new Date())}
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Student Particulars (Clean 4-Column Structured Table) */}
-            <div className="bg-slate-50 rounded-xl border border-slate-200 mb-3.5 overflow-hidden">
-              <table className="w-full text-xs">
-                <tbody>
-                  <tr className="border-b border-slate-200">
-                    <td className="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-[20%]">Student Full Name</td>
-                    <td className="px-3 py-2 font-black text-blue-950 text-xs w-[30%]">{student.studentName}</td>
-                    <td className="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-[20%]">Standard / Class</td>
-                    <td className="px-3 py-2 font-bold text-red-600 text-xs w-[30%]">{student.standard}</td>
-                  </tr>
-                  <tr className="border-b border-slate-200">
-                    <td className="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Reg. / Roll No.</td>
-                    <td className="px-3 py-2 font-mono font-bold text-slate-800 text-xs">{student.receiptNo || '—'}</td>
-                    <td className="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Academic Year</td>
-                    <td className="px-3 py-2 font-bold text-slate-800 text-xs">{student.academicYear || '2026-27'}</td>
-                  </tr>
-                  <tr className="border-b border-slate-200">
-                    <td className="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Father Contact</td>
-                    <td className="px-3 py-2 font-bold text-slate-800 text-xs">{student.fatherContact || student.contactNo || '—'}</td>
-                    <td className="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Mother Contact</td>
-                    <td className="px-3 py-2 font-bold text-slate-800 text-xs">{student.motherContact || student.parentContact || '—'}</td>
-                  </tr>
-                  <tr>
-                    <td className="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Admission Date</td>
-                    <td className="px-3 py-2 font-bold text-slate-800 text-xs">{formatDate(student.admissionDate)}</td>
-                    <td className="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Receipt Issue Date</td>
-                    <td className="px-3 py-2 font-bold text-slate-800 text-xs">{formatDate(new Date())}</td>
-                  </tr>
-                </tbody>
-              </table>
+            {/* Student Particulars (Responsive 2-Col on Mobile, 4-Col on Desktop) */}
+            <div className="bg-slate-50 rounded-xl border border-slate-200 mb-3 overflow-hidden p-2.5 sm:p-3.5">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 text-xs">
+                <div className="col-span-2 sm:col-span-1">
+                  <span className="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider">Student Name</span>
+                  <span className="font-black text-blue-950 text-xs sm:text-sm truncate block">{student.studentName}</span>
+                </div>
+
+                <div>
+                  <span className="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider">Standard / Class</span>
+                  <span className="font-bold text-red-600 text-xs sm:text-[13px] block">{student.standard}</span>
+                </div>
+
+                <div>
+                  <span className="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider">Reg. / Roll No.</span>
+                  <span className="font-mono font-bold text-slate-800 text-[11px] sm:text-xs block">{student.receiptNo || '—'}</span>
+                </div>
+
+                <div>
+                  <span className="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider">Academic Year</span>
+                  <span className="font-bold text-slate-800 text-[11px] sm:text-xs block">{student.academicYear || '2026-27'}</span>
+                </div>
+
+                <div>
+                  <span className="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider">Father Contact</span>
+                  <span className="font-bold text-slate-800 text-[11px] sm:text-xs block">{student.fatherContact || student.contactNo || '—'}</span>
+                </div>
+
+                <div>
+                  <span className="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider">Mother Contact</span>
+                  <span className="font-bold text-slate-800 text-[11px] sm:text-xs block">{student.motherContact || student.parentContact || '—'}</span>
+                </div>
+
+                <div>
+                  <span className="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider">Admission Date</span>
+                  <span className="font-bold text-slate-800 text-[11px] sm:text-xs block">{formatDate(student.admissionDate)}</span>
+                </div>
+
+                <div>
+                  <span className="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider">Receipt Issue</span>
+                  <span className="font-bold text-slate-800 text-[11px] sm:text-xs block">{formatDate(new Date())}</span>
+                </div>
+              </div>
             </div>
 
-            {/* Unified Fee Structure & Payments Breakdown Table */}
-            <div className="border border-slate-200 rounded-xl overflow-hidden mb-3.5 bg-white shadow-xs">
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="bg-blue-950 text-white text-[9px] font-bold uppercase tracking-wider">
-                    <th className="px-3 py-2">Particulars / Payment Details</th>
-                    <th className="px-3 py-2">Receipt No.</th>
-                    <th className="px-3 py-2">Date</th>
-                    <th className="px-3 py-2">Mode</th>
-                    <th className="px-3 py-2 text-right">Amount (₹)</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  <tr className="bg-slate-50/70">
-                    <td className="px-3 py-1.5 font-bold text-slate-700">Total Course Tuition Fees</td>
-                    <td className="px-3 py-1.5 text-slate-400">—</td>
-                    <td className="px-3 py-1.5 text-slate-400">—</td>
-                    <td className="px-3 py-1.5 text-slate-400">—</td>
-                    <td className="px-3 py-1.5 text-right font-black text-slate-900">{formatCurrency(student.totalFees)}</td>
-                  </tr>
-                  {student.discount > 0 && (
-                    <tr className="bg-emerald-50/50">
-                      <td className="px-3 py-1.5 font-bold text-emerald-800">Less: Special Scholarship / Fee Concession</td>
-                      <td className="px-3 py-1.5 text-slate-400">—</td>
-                      <td className="px-3 py-1.5 text-slate-400">—</td>
-                      <td className="px-3 py-1.5 text-slate-400">—</td>
-                      <td className="px-3 py-1.5 text-right font-bold text-emerald-700">- {formatCurrency(student.discount)}</td>
+            {/* Unified Fee Structure & Payments Breakdown Table (Scroll-safe on phone) */}
+            <div className="border border-slate-200 rounded-xl overflow-hidden mb-3 bg-white shadow-xs">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs min-w-[440px] sm:min-w-full">
+                  <thead>
+                    <tr className="bg-blue-950 text-white text-[9px] font-bold uppercase tracking-wider">
+                      <th className="px-2.5 sm:px-3 py-2">Particulars / Payment Details</th>
+                      <th className="px-2 sm:px-3 py-2">Receipt No.</th>
+                      <th className="px-2 sm:px-3 py-2">Date</th>
+                      <th className="px-2 sm:px-3 py-2">Mode</th>
+                      <th className="px-2.5 sm:px-3 py-2 text-right">Amount (₹)</th>
                     </tr>
-                  )}
-                  <tr className="bg-slate-100 font-bold border-b-2 border-slate-300">
-                    <td colSpan={4} className="px-3 py-1.5 text-blue-950 font-black">Net Total Payable Course Fees</td>
-                    <td className="px-3 py-1.5 text-right text-blue-950 font-black text-xs">{formatCurrency(student.grandTotal)}</td>
-                  </tr>
-                  <tr className="bg-slate-200/80">
-                    <td colSpan={5} className="px-3 py-1 text-[9px] font-black uppercase tracking-wider text-slate-700">
-                      Cleared Installment Payments ({paidInstallments.length} Cleared)
-                    </td>
-                  </tr>
-                  {paidInstallments.length > 0 ? (
-                    paidInstallments.map((inst, idx) => {
-                      const sNo = inst.srNo || idx + 1;
-                      const instRecNo = inst.receiptNo || `${student.receiptNo}-${String(sNo).padStart(2, '0')}`;
-                      return (
-                        <tr key={idx} className="bg-emerald-50/30">
-                          <td className="px-3 py-1.5 font-bold text-slate-800">
-                            Installment
-                          </td>
-                          <td className="px-3 py-1.5 font-mono font-bold text-blue-950 text-[10px]">
-                            {instRecNo}
-                          </td>
-                          <td className="px-3 py-1.5 text-slate-700 font-medium text-[11px]">
-                            {formatDate(inst.paidDate || inst.dueDate)}
-                          </td>
-                          <td className="px-3 py-1.5 text-slate-800 font-semibold text-[11px]">
-                            {inst.paymentMode || 'Cash'}
-                            {inst.transactionDetails && inst.transactionDetails !== 'Cash' && inst.transactionDetails !== 'Counter Payment' && (
-                              <span className="block text-[9px] text-slate-500 font-normal">
-                                {inst.transactionDetails}
-                              </span>
-                            )}
-                          </td>
-                          <td className="px-3 py-1.5 text-right font-black text-emerald-700">
-                            {formatCurrency(inst.amount)}
-                          </td>
-                        </tr>
-                      );
-                    })
-                  ) : (
-                    <tr>
-                      <td colSpan={5} className="px-3 py-3 text-center text-slate-400 font-medium italic text-[11px]">
-                        No payments cleared yet.
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    <tr className="bg-slate-50/70">
+                      <td className="px-2.5 sm:px-3 py-1.5 font-bold text-slate-700">Total Course Tuition Fees</td>
+                      <td className="px-2 sm:px-3 py-1.5 text-slate-400">—</td>
+                      <td className="px-2 sm:px-3 py-1.5 text-slate-400">—</td>
+                      <td className="px-2 sm:px-3 py-1.5 text-slate-400">—</td>
+                      <td className="px-2.5 sm:px-3 py-1.5 text-right font-black text-slate-900">{formatCurrency(student.totalFees)}</td>
+                    </tr>
+                    {student.discount > 0 && (
+                      <tr className="bg-emerald-50/50">
+                        <td className="px-2.5 sm:px-3 py-1.5 font-bold text-emerald-800">Less: Scholarship Concession</td>
+                        <td className="px-2 sm:px-3 py-1.5 text-slate-400">—</td>
+                        <td className="px-2 sm:px-3 py-1.5 text-slate-400">—</td>
+                        <td className="px-2 sm:px-3 py-1.5 text-slate-400">—</td>
+                        <td className="px-2.5 sm:px-3 py-1.5 text-right font-bold text-emerald-700">- {formatCurrency(student.discount)}</td>
+                      </tr>
+                    )}
+                    <tr className="bg-slate-100 font-bold border-b-2 border-slate-300">
+                      <td colSpan={4} className="px-2.5 sm:px-3 py-1.5 text-blue-950 font-black">Net Total Payable Course Fees</td>
+                      <td className="px-2.5 sm:px-3 py-1.5 text-right text-blue-950 font-black text-xs">{formatCurrency(student.grandTotal)}</td>
+                    </tr>
+                    <tr className="bg-slate-200/80">
+                      <td colSpan={5} className="px-2.5 sm:px-3 py-1 text-[9px] font-black uppercase tracking-wider text-slate-700">
+                        Cleared Installment Payments ({paidInstallments.length} Cleared)
                       </td>
                     </tr>
-                  )}
-                </tbody>
-              </table>
+                    {paidInstallments.length > 0 ? (
+                      paidInstallments.map((inst, idx) => {
+                        const sNo = inst.srNo || idx + 1;
+                        const instRecNo = inst.receiptNo || `${student.receiptNo}-${String(sNo).padStart(2, '0')}`;
+                        return (
+                          <tr key={idx} className="bg-emerald-50/30">
+                            <td className="px-2.5 sm:px-3 py-1.5 font-bold text-slate-800">
+                              Installment
+                            </td>
+                            <td className="px-2 sm:px-3 py-1.5 font-mono font-bold text-blue-950 text-[10px] whitespace-nowrap">
+                              {instRecNo}
+                            </td>
+                            <td className="px-2 sm:px-3 py-1.5 text-slate-700 font-medium text-[10px] sm:text-[11px] whitespace-nowrap">
+                              {formatDate(inst.paidDate || inst.dueDate)}
+                            </td>
+                            <td className="px-2 sm:px-3 py-1.5 text-slate-800 font-semibold text-[10px] sm:text-[11px]">
+                              {inst.paymentMode || 'Cash'}
+                              {inst.transactionDetails && inst.transactionDetails !== 'Cash' && inst.transactionDetails !== 'Counter Payment' && (
+                                <span className="block text-[8.5px] text-slate-500 font-normal">
+                                  {inst.transactionDetails}
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-2.5 sm:px-3 py-1.5 text-right font-black text-emerald-700 whitespace-nowrap">
+                              {formatCurrency(inst.amount)}
+                            </td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td colSpan={5} className="px-3 py-3 text-center text-slate-400 font-medium italic text-[11px]">
+                          No payments cleared yet.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
-            {/* Financial Balance Strip (3 Columns) */}
-            <div className="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-300 text-center mb-3.5 text-xs">
-              <div>
-                <span className="block text-[9.5px] font-bold uppercase tracking-wider text-slate-500">Net Payable Fees</span>
-                <span className="text-sm sm:text-base font-black text-slate-900">{formatCurrency(student.grandTotal)}</span>
+            {/* Financial Balance Strip (3 Columns, mobile optimized) */}
+            <div className="grid grid-cols-3 gap-1.5 sm:gap-2 bg-slate-50 p-2.5 sm:p-3 rounded-xl border border-slate-300 text-center mb-3 text-xs">
+              <div className="flex flex-col justify-center">
+                <span className="block text-[8.5px] sm:text-[9.5px] font-bold uppercase tracking-wider text-slate-500 leading-tight">Net Total</span>
+                <span className="text-xs sm:text-base font-black text-slate-900 mt-0.5">{formatCurrency(student.grandTotal)}</span>
               </div>
-              <div className="border-x border-slate-200 px-2">
-                <span className="block text-[9.5px] font-bold uppercase tracking-wider text-emerald-600">Total Fees Collected</span>
-                <span className="text-sm sm:text-base font-black text-emerald-700">{formatCurrency(student.totalPaid)}</span>
+              <div className="border-x border-slate-200 px-1 flex flex-col justify-center">
+                <span className="block text-[8.5px] sm:text-[9.5px] font-bold uppercase tracking-wider text-emerald-600 leading-tight">Collected</span>
+                <span className="text-xs sm:text-base font-black text-emerald-700 mt-0.5">{formatCurrency(student.totalPaid)}</span>
               </div>
-              <div>
-                <span className="block text-[9.5px] font-bold uppercase tracking-wider text-red-500">Outstanding Balance Due</span>
+              <div className="flex flex-col justify-center">
+                <span className="block text-[8.5px] sm:text-[9.5px] font-bold uppercase tracking-wider text-red-500 leading-tight">Balance Due</span>
                 <span
-                  className={`text-sm sm:text-base font-black ${
+                  className={`text-xs sm:text-base font-black mt-0.5 ${
                     student.balanceLeft > 0 ? 'text-red-700' : 'text-emerald-600'
                   }`}
                 >
-                  {student.balanceLeft > 0 ? formatCurrency(student.balanceLeft) : 'NIL (CLEARED)'}
+                  {student.balanceLeft > 0 ? formatCurrency(student.balanceLeft) : 'NIL'}
                 </span>
               </div>
             </div>
 
             {/* Terms and Conditions */}
-            <div className="mb-4 text-[9px] text-slate-500 space-y-0.5 border-t border-slate-200 pt-2 leading-tight">
-              <p className="font-bold text-slate-700 uppercase tracking-wider">Terms & Conditions:</p>
+            <div className="mb-3 sm:mb-4 text-[8.5px] sm:text-[9px] text-slate-500 space-y-0.5 border-t border-slate-200 pt-2 leading-tight">
+              <p className="font-bold text-slate-700 uppercase tracking-wider text-[9px]">Terms & Conditions:</p>
               {(settings?.terms || [
                 '1. The receipt is subject to realisation of payment.',
                 '2. This receipt should be carefully preserved and must be produced on demand.',
@@ -598,16 +619,36 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
             </div>
 
             {/* Signature Block */}
-            <div className="flex justify-end pt-3 border-t border-dashed border-slate-300 text-xs">
+            <div className="flex justify-end pt-2 sm:pt-3 border-t border-dashed border-slate-300 text-xs">
               <div className="text-center">
-                <div className="text-[9px] font-bold text-blue-950 uppercase tracking-wider mb-6">
+                <div className="text-[9px] font-bold text-blue-950 uppercase tracking-wider mb-5 sm:mb-6">
                   For {settings?.instituteName || 'SHREE SAI CLASSES'}
                 </div>
-                <div className="w-36 border-b border-slate-400 mb-1" />
-                <span className="text-[10px] font-bold text-slate-600">Authorized Signatory</span>
+                <div className="w-32 sm:w-36 border-b border-slate-400 mb-1" />
+                <span className="text-[9.5px] sm:text-[10px] font-bold text-slate-600">Authorized Signatory</span>
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Sticky Mobile Bottom Action Bar (Thumb-friendly on Phones) */}
+        <div className="p-3 sm:hidden border-t border-slate-200 bg-white flex items-center gap-2 shrink-0 shadow-lg no-print">
+          <button
+            onClick={handleSharePDF}
+            disabled={isGenerating}
+            className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-sm active:scale-95 disabled:opacity-50 transition-all"
+          >
+            {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" />}
+            <span>Share PDF</span>
+          </button>
+          <button
+            onClick={handleDownloadPDF}
+            disabled={isGenerating}
+            className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-3 bg-blue-900 hover:bg-blue-800 active:bg-blue-950 text-white font-bold text-xs rounded-xl shadow-sm active:scale-95 disabled:opacity-50 transition-all"
+          >
+            {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+            <span>Download</span>
+          </button>
         </div>
       </div>
     </div>

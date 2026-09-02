@@ -1,60 +1,5 @@
 [
   {
-    "id": "stud-989e4144-c103-47da-9dcf-ff34c7227081",
-    "receiptNo": "SSC-REC-2026-181",
-    "studentName": "saee",
-    "standard": "SYJC (12th Commerce)",
-    "board": "CBSE",
-    "courseName": "SYJC - COMMERCE (BK, Accounts, Maths, Eco, OCM)",
-    "academicYear": "2024-25",
-    "fatherContact": "",
-    "motherContact": "",
-    "contactNo": "",
-    "parentContact": "",
-    "admissionDate": "2026-09-02",
-    "feesDate": "2026-09-02",
-    "reportDate": "2026-09-02",
-    "totalFees": 45000,
-    "discount": 0,
-    "grandTotal": 45000,
-    "totalPaid": 30000,
-    "balanceLeft": 15000,
-    "status": "PARTIAL",
-    "installments": [
-      {
-        "srNo": 1,
-        "amount": 15000,
-        "status": "PAID",
-        "dueDate": "2026-09-02",
-        "paidDate": "2026-09-02",
-        "receiptNo": "SSC-REC-2026-181-01",
-        "paymentMode": "Cash",
-        "transactionDetails": "Cash"
-      },
-      {
-        "srNo": 2,
-        "amount": 15000,
-        "status": "PAID",
-        "dueDate": "2026-10-02",
-        "paidDate": "2026-09-02",
-        "receiptNo": "SSC-REC-2026-181-02",
-        "paymentMode": "Cash",
-        "transactionDetails": ""
-      },
-      {
-        "srNo": 3,
-        "amount": 15000,
-        "status": "PENDING",
-        "dueDate": "2026-11-01",
-        "paidDate": "",
-        "receiptNo": "SSC-REC-2026-181-03",
-        "paymentMode": "",
-        "transactionDetails": ""
-      }
-    ],
-    "notes": ""
-  },
-  {
     "id": "stud-89692144-b590-4209-b6fb-2fcf6a8418f9",
     "receiptNo": "SSC-REC-2026-180",
     "studentName": "Rutika Dagala",
@@ -123,6 +68,71 @@
       }
     ],
     "notes": ""
+  },
+  {
+    "id": "stud-164a048b-757d-4737-a70a-191ebcbc93e5",
+    "receiptNo": "SSC23/2026-2027/0103",
+    "studentName": "Sujal Rohini Sunil Avhad",
+    "standard": "Class 10",
+    "board": "CBSE",
+    "courseName": "Class 10 - CBSE / ICSE / SSC (Maths & Science Package)",
+    "academicYear": "2026-27",
+    "fatherContact": "",
+    "motherContact": "",
+    "contactNo": "",
+    "parentContact": "",
+    "admissionDate": "2025-12-04",
+    "feesDate": "2026-09-02",
+    "reportDate": "2026-09-02",
+    "totalFees": 21000,
+    "discount": 0,
+    "grandTotal": 21000,
+    "totalPaid": 17500,
+    "balanceLeft": 3500,
+    "status": "PARTIAL",
+    "installments": [
+      {
+        "srNo": 1,
+        "amount": 10000,
+        "status": "PAID",
+        "dueDate": "2025-12-04",
+        "paidDate": "2025-12-04",
+        "paymentMode": "Cash",
+        "transactionDetails": "Receipt #SSC23/2026-2027/0103-01",
+        "receiptNo": "SSC23/2026-2027/0103-01"
+      },
+      {
+        "srNo": 2,
+        "amount": 5000,
+        "status": "PAID",
+        "dueDate": "2025-12-04",
+        "paidDate": "2025-12-04",
+        "paymentMode": "Cash",
+        "transactionDetails": "Receipt #SSC23/2026-2027/0103-02",
+        "receiptNo": "SSC23/2026-2027/0103-02"
+      },
+      {
+        "srNo": 3,
+        "amount": 2500,
+        "status": "PAID",
+        "dueDate": "2025-12-04",
+        "paidDate": "2025-12-04",
+        "paymentMode": "Cash",
+        "transactionDetails": "Receipt #SSC23/2026-2027/0103-03",
+        "receiptNo": "SSC23/2026-2027/0103-03"
+      },
+      {
+        "srNo": 4,
+        "amount": 3500,
+        "status": "PENDING",
+        "dueDate": "2026-10-13",
+        "paidDate": "",
+        "paymentMode": "",
+        "transactionDetails": "",
+        "receiptNo": "SSC23/2026-2027/0103-04"
+      }
+    ],
+    "notes": "PENDING"
   },
   {
     "id": "stud-2b01e3c8-ecd5-4b5e-8a48-b6929be2a239",
@@ -7415,71 +7425,6 @@
     "notes": "PENDING"
   },
   {
-    "id": "stud-1c074d36-543e-400a-b8d2-8e6d7e2346fe",
-    "receiptNo": "SSC23/2026-2027/0258",
-    "studentName": "Shlok Shravani Govind Modesing",
-    "standard": "Class 6",
-    "board": "CBSE",
-    "courseName": "Class 6 - CBSE / ICSE / SSC (Maths & Science Package)",
-    "academicYear": "2026-27",
-    "fatherContact": "",
-    "motherContact": "",
-    "contactNo": "",
-    "parentContact": "",
-    "admissionDate": "2026-06-02",
-    "feesDate": "2026-09-02",
-    "reportDate": "2026-09-02",
-    "totalFees": 8500,
-    "discount": 0,
-    "grandTotal": 8500,
-    "totalPaid": 6000,
-    "balanceLeft": 2500,
-    "status": "PARTIAL",
-    "installments": [
-      {
-        "srNo": 1,
-        "amount": 2000,
-        "status": "PAID",
-        "dueDate": "2026-06-02",
-        "paidDate": "2026-06-02",
-        "paymentMode": "Cash",
-        "transactionDetails": "Receipt #SSC23/2026-2027/0258-01",
-        "receiptNo": "SSC23/2026-2027/0258-01"
-      },
-      {
-        "srNo": 2,
-        "amount": 2000,
-        "status": "PAID",
-        "dueDate": "2026-06-02",
-        "paidDate": "2026-06-02",
-        "paymentMode": "Cash",
-        "transactionDetails": "Receipt #SSC23/2026-2027/0258-02",
-        "receiptNo": "SSC23/2026-2027/0258-02"
-      },
-      {
-        "srNo": 3,
-        "amount": 2000,
-        "status": "PAID",
-        "dueDate": "2026-06-02",
-        "paidDate": "2026-06-02",
-        "paymentMode": "Cash",
-        "transactionDetails": "Receipt #SSC23/2026-2027/0258-03",
-        "receiptNo": "SSC23/2026-2027/0258-03"
-      },
-      {
-        "srNo": 4,
-        "amount": 2500,
-        "status": "PENDING",
-        "dueDate": "2026-10-10",
-        "paidDate": "",
-        "paymentMode": "",
-        "transactionDetails": "",
-        "receiptNo": "SSC23/2026-2027/0258-04"
-      }
-    ],
-    "notes": "PENDING"
-  },
-  {
     "id": "stud-2ae5312f-8315-4d89-8321-50d33e72a3f8",
     "receiptNo": "SSC23/2026-2027/0101",
     "studentName": "Siddhi Krutika Deepak More",
@@ -7513,6 +7458,61 @@
       }
     ],
     "notes": "CLEAR"
+  },
+  {
+    "id": "stud-a788bd9a-3a35-433a-8d5f-c3f3f3906db0",
+    "receiptNo": "SSC23/2026-2027/0259",
+    "studentName": "Punith Tulsi Parmesh Shetty",
+    "standard": "Class 8",
+    "board": "CBSE",
+    "courseName": "Class 8 - CBSE / ICSE / SSC (Maths & Science Package)",
+    "academicYear": "2026-27",
+    "fatherContact": "",
+    "motherContact": "",
+    "contactNo": "",
+    "parentContact": "",
+    "admissionDate": "2026-06-14",
+    "feesDate": "2026-09-02",
+    "reportDate": "2026-09-02",
+    "totalFees": 10500,
+    "discount": 0,
+    "grandTotal": 10500,
+    "totalPaid": 8000,
+    "balanceLeft": 2500,
+    "status": "PARTIAL",
+    "installments": [
+      {
+        "srNo": 1,
+        "amount": 5000,
+        "status": "PAID",
+        "dueDate": "2026-06-14",
+        "paidDate": "2026-06-14",
+        "paymentMode": "Online",
+        "transactionDetails": "Receipt #SSC23/2026-2027/0259-01",
+        "receiptNo": "SSC23/2026-2027/0259-01"
+      },
+      {
+        "srNo": 2,
+        "amount": 3000,
+        "status": "PAID",
+        "dueDate": "2026-06-14",
+        "paidDate": "2026-06-14",
+        "paymentMode": "Online",
+        "transactionDetails": "Receipt #SSC23/2026-2027/0259-02",
+        "receiptNo": "SSC23/2026-2027/0259-02"
+      },
+      {
+        "srNo": 3,
+        "amount": 2500,
+        "status": "PENDING",
+        "dueDate": "2026-10-11",
+        "paidDate": "",
+        "paymentMode": "",
+        "transactionDetails": "",
+        "receiptNo": "SSC23/2026-2027/0259-03"
+      }
+    ],
+    "notes": "PENDING"
   },
   {
     "id": "stud-62bb7a05-6d80-4116-bb73-0fc31855bae9",
@@ -8390,56 +8390,66 @@
     "notes": "PENDING"
   },
   {
-    "id": "stud-a788bd9a-3a35-433a-8d5f-c3f3f3906db0",
-    "receiptNo": "SSC23/2026-2027/0259",
-    "studentName": "Punith Tulsi Parmesh Shetty",
-    "standard": "Class 8",
+    "id": "stud-1c074d36-543e-400a-b8d2-8e6d7e2346fe",
+    "receiptNo": "SSC23/2026-2027/0258",
+    "studentName": "Shlok Shravani Govind Modesing",
+    "standard": "Class 6",
     "board": "CBSE",
-    "courseName": "Class 8 - CBSE / ICSE / SSC (Maths & Science Package)",
+    "courseName": "Class 6 - CBSE / ICSE / SSC (Maths & Science Package)",
     "academicYear": "2026-27",
     "fatherContact": "",
     "motherContact": "",
     "contactNo": "",
     "parentContact": "",
-    "admissionDate": "2026-06-14",
+    "admissionDate": "2026-06-02",
     "feesDate": "2026-09-02",
     "reportDate": "2026-09-02",
-    "totalFees": 10500,
+    "totalFees": 8500,
     "discount": 0,
-    "grandTotal": 10500,
-    "totalPaid": 8000,
+    "grandTotal": 8500,
+    "totalPaid": 6000,
     "balanceLeft": 2500,
     "status": "PARTIAL",
     "installments": [
       {
         "srNo": 1,
-        "amount": 5000,
+        "amount": 2000,
         "status": "PAID",
-        "dueDate": "2026-06-14",
-        "paidDate": "2026-06-14",
-        "paymentMode": "Online",
-        "transactionDetails": "Receipt #SSC23/2026-2027/0259-01",
-        "receiptNo": "SSC23/2026-2027/0259-01"
+        "dueDate": "2026-06-02",
+        "paidDate": "2026-06-02",
+        "paymentMode": "Cash",
+        "transactionDetails": "Receipt #SSC23/2026-2027/0258-01",
+        "receiptNo": "SSC23/2026-2027/0258-01"
       },
       {
         "srNo": 2,
-        "amount": 3000,
+        "amount": 2000,
         "status": "PAID",
-        "dueDate": "2026-06-14",
-        "paidDate": "2026-06-14",
-        "paymentMode": "Online",
-        "transactionDetails": "Receipt #SSC23/2026-2027/0259-02",
-        "receiptNo": "SSC23/2026-2027/0259-02"
+        "dueDate": "2026-06-02",
+        "paidDate": "2026-06-02",
+        "paymentMode": "Cash",
+        "transactionDetails": "Receipt #SSC23/2026-2027/0258-02",
+        "receiptNo": "SSC23/2026-2027/0258-02"
       },
       {
         "srNo": 3,
+        "amount": 2000,
+        "status": "PAID",
+        "dueDate": "2026-06-02",
+        "paidDate": "2026-06-02",
+        "paymentMode": "Cash",
+        "transactionDetails": "Receipt #SSC23/2026-2027/0258-03",
+        "receiptNo": "SSC23/2026-2027/0258-03"
+      },
+      {
+        "srNo": 4,
         "amount": 2500,
         "status": "PENDING",
-        "dueDate": "2026-10-11",
+        "dueDate": "2026-10-10",
         "paidDate": "",
         "paymentMode": "",
         "transactionDetails": "",
-        "receiptNo": "SSC23/2026-2027/0259-03"
+        "receiptNo": "SSC23/2026-2027/0258-04"
       }
     ],
     "notes": "PENDING"
@@ -8478,70 +8488,5 @@
       }
     ],
     "notes": "CLEAR"
-  },
-  {
-    "id": "stud-164a048b-757d-4737-a70a-191ebcbc93e5",
-    "receiptNo": "SSC23/2026-2027/0103",
-    "studentName": "Sujal Rohini Sunil Avhad",
-    "standard": "Class 10",
-    "board": "CBSE",
-    "courseName": "Class 10 - CBSE / ICSE / SSC (Maths & Science Package)",
-    "academicYear": "2026-27",
-    "fatherContact": "",
-    "motherContact": "",
-    "contactNo": "",
-    "parentContact": "",
-    "admissionDate": "2025-12-04",
-    "feesDate": "2026-09-02",
-    "reportDate": "2026-09-02",
-    "totalFees": 21000,
-    "discount": 0,
-    "grandTotal": 21000,
-    "totalPaid": 17500,
-    "balanceLeft": 3500,
-    "status": "PARTIAL",
-    "installments": [
-      {
-        "srNo": 1,
-        "amount": 10000,
-        "status": "PAID",
-        "dueDate": "2025-12-04",
-        "paidDate": "2025-12-04",
-        "paymentMode": "Cash",
-        "transactionDetails": "Receipt #SSC23/2026-2027/0103-01",
-        "receiptNo": "SSC23/2026-2027/0103-01"
-      },
-      {
-        "srNo": 2,
-        "amount": 5000,
-        "status": "PAID",
-        "dueDate": "2025-12-04",
-        "paidDate": "2025-12-04",
-        "paymentMode": "Cash",
-        "transactionDetails": "Receipt #SSC23/2026-2027/0103-02",
-        "receiptNo": "SSC23/2026-2027/0103-02"
-      },
-      {
-        "srNo": 3,
-        "amount": 2500,
-        "status": "PAID",
-        "dueDate": "2025-12-04",
-        "paidDate": "2025-12-04",
-        "paymentMode": "Cash",
-        "transactionDetails": "Receipt #SSC23/2026-2027/0103-03",
-        "receiptNo": "SSC23/2026-2027/0103-03"
-      },
-      {
-        "srNo": 4,
-        "amount": 3500,
-        "status": "PENDING",
-        "dueDate": "2026-10-13",
-        "paidDate": "",
-        "paymentMode": "",
-        "transactionDetails": "",
-        "receiptNo": "SSC23/2026-2027/0103-04"
-      }
-    ],
-    "notes": "PENDING"
   }
 ]
