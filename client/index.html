@@ -35,6 +35,27 @@
             navigator.serviceWorker.register('/sw.js').then((reg) => {
               console.log('✅ PWA Active:', reg.scope);
               reg.update();
+
+              // Check for incoming updates
+              reg.addEventListener('updatefound', () => {
+                const newWorker = reg.installing;
+                if (newWorker) {
+                  newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                      newWorker.postMessage({ type: 'SKIP_WAITING' });
+                    }
+                  });
+                }
+              });
+            });
+
+            // Reload automatically when new service worker takes over
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+              if (!refreshing) {
+                refreshing = true;
+                window.location.reload();
+              }
             });
           });
         } else {

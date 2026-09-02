@@ -11,6 +11,7 @@ import {
   Share,
   LogOut,
   User,
+  RefreshCw,
 } from 'lucide-react';
 
 export const Navbar = ({
@@ -21,6 +22,8 @@ export const Navbar = ({
   settings,
   currentUser,
   onLogout,
+  onSync,
+  isSyncing,
 }) => {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [isInstalled, setIsInstalled] = useState(false);
@@ -131,6 +134,17 @@ export const Navbar = ({
               >
                 <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-700" />
                 <span className="hidden lg:inline">Export</span>
+              </button>
+
+              {/* Live Cloud Sync Button (Instantly syncs phone & desktop) */}
+              <button
+                onClick={onSync}
+                disabled={isSyncing}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs font-bold text-slate-700 hover:text-blue-900 bg-white hover:bg-slate-50 border border-slate-300 rounded-xl transition-all shadow-2xs active:scale-95 disabled:opacity-50"
+                title="Sync latest records from cloud database"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-800 ${isSyncing ? 'animate-spin text-blue-600' : ''}`} />
+                <span className="hidden sm:inline">{isSyncing ? 'Syncing...' : 'Sync'}</span>
               </button>
 
               {/* Settings (Admin / Director) */}

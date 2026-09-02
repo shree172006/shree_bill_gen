@@ -10,6 +10,7 @@ import {
   AlertCircle,
   Clock,
   Sparkles,
+  RefreshCw,
 } from 'lucide-react';
 import { formatCurrency, formatDate } from '../utils/formatters';
 
@@ -26,6 +27,8 @@ export const StudentTable = ({
   onEditStudent,
   onDeleteStudent,
   currentUser,
+  onSync,
+  isSyncing,
 }) => {
   const isSchoolSection = currentUser?.section === 'school';
   const isCollegeSection = currentUser?.section === 'college';
@@ -117,6 +120,19 @@ export const StudentTable = ({
               </optgroup>
             )}
           </select>
+
+          {/* Quick Refresh Button */}
+          {onSync && (
+            <button
+              onClick={onSync}
+              disabled={isSyncing || loading}
+              className="p-2 sm:px-3 sm:py-2 text-xs font-bold text-slate-700 hover:text-blue-900 bg-white hover:bg-slate-100 border border-slate-300 rounded-xl transition-all shadow-2xs active:scale-95 flex items-center justify-center gap-1.5 disabled:opacity-50 shrink-0"
+              title="Sync latest records from cloud database"
+            >
+              <RefreshCw className={`h-4 w-4 text-blue-800 ${isSyncing ? 'animate-spin text-blue-600' : ''}`} />
+              <span className="hidden xl:inline">{isSyncing ? 'Syncing...' : 'Sync'}</span>
+            </button>
+          )}
         </div>
       </div>
 

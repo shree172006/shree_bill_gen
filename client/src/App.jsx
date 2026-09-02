@@ -87,12 +87,6 @@ export function App() {
     }
   };
 
-  useEffect(() => {
-    if (currentUser) {
-      loadStudents();
-    }
-  }, [searchTerm, statusFilter, standardFilter]);
-
   const loadStudents = async () => {
     if (!currentUser) return;
     try {
@@ -109,6 +103,75 @@ export function App() {
       console.error('Error fetching students:', err);
     }
   };
+
+  useEffect(() => {
+    if (currentUser) {
+      loadStudents();
+    }
+  }, [searchTerm, statusFilter, standardFilter]);
+
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  // Manual Sync trigger
+  const handleSyncData = async () => {
+    if (!currentUser || isSyncing) return;
+    setIsSyncing(true);
+    try {
+      const [studentsRes, statsRes] = await Promise.all([
+        studentAPI.getAll({
+          search: searchTerm,
+          status: statusFilter,
+          standard: standardFilter,
+          section: currentUser.section || 'all',
+        }),
+        studentAPI.getStats({ section: currentUser.section || 'all' }),
+      ]);
+      if (studentsRes.data?.success) setStudents(studentsRes.data.data);
+      if (statsRes.data?.success) setStats(statsRes.data.data);
+      setToast({
+        title: 'Database Synced',
+        message: `Fetched latest cloud records (${studentsRes.data?.data?.length || 0} students).`,
+        type: 'success',
+      });
+    } catch (err) {
+      setToast({
+        title: 'Sync Failed',
+        message: 'Could not connect to database. Check network connection.',
+        type: 'error',
+      });
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  // Auto-Sync on Tab Focus & Mobile App Visibility (Ensures mobile PWA is always updated)
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const handleAutoSync = () => {
+      if (document.visibilityState === 'visible') {
+        loadStudents();
+        studentAPI
+          .getStats({ section: currentUser.section || 'all' })
+          .then((res) => {
+            if (res.data?.success) setStats(res.data.data);
+          })
+          .catch(() => {});
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleAutoSync);
+    window.addEventListener('focus', handleAutoSync);
+
+    // 20-second silent background poll
+    const intervalId = setInterval(handleAutoSync, 20000);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleAutoSync);
+      window.removeEventListener('focus', handleAutoSync);
+      clearInterval(intervalId);
+    };
+  }, [currentUser, searchTerm, statusFilter, standardFilter]);
 
   const handleLoginSuccess = (user, token) => {
     localStorage.setItem('shree_auth_user', JSON.stringify(user));
@@ -268,6 +331,8 @@ export function App() {
         onImportExcel={() => setIsExcelModalOpen(true)}
         onExportExcel={handleExportExcel}
         onOpenSettings={() => setIsSettingsModalOpen(true)}
+        onSync={handleSyncData}
+        isSyncing={isSyncing}
       />
 
       {/* Main Container */}
@@ -279,6 +344,8 @@ export function App() {
         <StudentTable
           students={students}
           loading={loading}
+          isSyncing={isSyncing}
+          onSync={handleSyncData}
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
           statusFilter={statusFilter}

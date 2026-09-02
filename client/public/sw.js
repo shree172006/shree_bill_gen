@@ -1,10 +1,17 @@
-const CACHE_NAME = 'shree-sai-billing-v2';
+const CACHE_NAME = 'shree-sai-billing-v3';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/icon.svg',
+  '/logo.png',
 ];
+
+// Handle immediate skip waiting command from client
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
 
 // Install: Cache core assets and immediately activate
 self.addEventListener('install', (event) => {
