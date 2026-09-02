@@ -27,15 +27,17 @@ export const getStudents = async (req, res) => {
   }
 
   // Standard dropdown filter
-  if (standard && standard !== 'ALL') {
+  if (standard && standard.toLowerCase() !== 'all') {
     filtered = filtered.filter(
       (s) => (s.standard || '').toLowerCase() === standard.toLowerCase()
     );
   }
 
   // Status Filter
-  if (status && status !== 'ALL') {
-    filtered = filtered.filter((s) => s.status === status);
+  if (status && status.toLowerCase() !== 'all') {
+    filtered = filtered.filter(
+      (s) => (s.status || '').toUpperCase() === status.toUpperCase()
+    );
   }
 
   // Search Query Filter
