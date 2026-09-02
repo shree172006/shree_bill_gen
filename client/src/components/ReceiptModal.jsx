@@ -29,26 +29,51 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
     if (!receiptRef.current) return null;
     const element = receiptRef.current;
 
-    // Dynamically load html2canvas & jsPDF for instant performance
+    // Dynamically load html2canvas & jsPDF
     const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
       import('html2canvas'),
       import('jspdf'),
     ]);
 
     // Give browser a tick to paint loading spinner
-    await new Promise((resolve) => setTimeout(resolve, 60));
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
-    const canvas = await html2canvas(element, {
-      scale: 2,
-      useCORS: true,
-      logging: false,
-      backgroundColor: '#ffffff',
-      scrollX: 0,
-      scrollY: -window.scrollY,
-      windowWidth: document.documentElement.offsetWidth,
-      height: element.scrollHeight,
-      width: element.offsetWidth,
-    });
+    // Create an isolated fixed-dimension A4 clone (720px desktop width)
+    // This guarantees the PDF is NEVER distorted or squished by mobile phone screens!
+    const clone = element.cloneNode(true);
+    clone.id = 'printable-receipt-a4-render';
+    clone.style.width = '720px';
+    clone.style.minWidth = '720px';
+    clone.style.maxWidth = '720px';
+    clone.style.position = 'absolute';
+    clone.style.left = '-9999px';
+    clone.style.top = '0px';
+    clone.style.margin = '0';
+    clone.style.padding = '24px';
+    clone.style.boxSizing = 'border-box';
+    clone.style.backgroundColor = '#ffffff';
+    clone.style.borderRadius = '0px';
+    clone.style.border = 'none';
+    clone.style.boxShadow = 'none';
+    document.body.appendChild(clone);
+
+    let canvas;
+    try {
+      canvas = await html2canvas(clone, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        width: 720,
+        windowWidth: 720,
+      });
+    } finally {
+      if (document.body.contains(clone)) {
+        document.body.removeChild(clone);
+      }
+    }
+
+    if (!canvas) return null;
 
     const imgData = canvas.toDataURL('image/jpeg', 0.95);
     const pdf = new jsPDF({
@@ -61,8 +86,8 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
     const pageWidth = 210;
     const pageHeight = 297;
     const margin = 8;
-    const maxPrintWidth = pageWidth - margin * 2;
-    const maxPrintHeight = pageHeight - margin * 2;
+    const maxPrintWidth = pageWidth - margin * 2; // 194mm
+    const maxPrintHeight = pageHeight - margin * 2; // 281mm
 
     const imgWidth = maxPrintWidth;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
@@ -291,7 +316,7 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
 
                 <div>
                   <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-500">Academic Year</span>
-                  <span className="font-bold text-slate-900 text-xs">{student.academicYear || '2024-25'}</span>
+                  <span className="font-bold text-slate-900 text-xs">{student.academicYear || '2026-27'}</span>
                 </div>
 
                 <div>
