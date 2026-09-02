@@ -77,8 +77,8 @@ export const Navbar = ({
           <div className="flex items-center justify-between h-16 sm:h-20">
             {/* Brand & Crest Monogram */}
             <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
-              <div className="h-9 w-9 sm:h-12 sm:w-12 shrink-0 rounded-xl bg-gradient-to-tr from-blue-900 via-blue-800 to-blue-700 p-0.5 shadow-md flex items-center justify-center border-2 border-red-600">
-                <GraduationCap className="h-5 w-5 sm:h-7 sm:w-7 text-amber-300" />
+              <div className="h-9 w-9 sm:h-12 sm:w-12 shrink-0 rounded-xl bg-white p-0.5 shadow-md flex items-center justify-center border-2 border-red-600 overflow-hidden">
+                <img src="/logo.png" alt="Shree Sai Classes" className="h-full w-full object-contain" />
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5 sm:gap-2">
@@ -196,8 +196,8 @@ export const Navbar = ({
             </button>
 
             <div className="flex items-center gap-3 mb-4">
-              <div className="h-12 w-12 rounded-xl bg-blue-950 flex items-center justify-center border-2 border-red-600 shadow-md">
-                <GraduationCap className="h-7 w-7 text-amber-300" />
+              <div className="h-12 w-12 rounded-xl bg-white p-0.5 flex items-center justify-center border-2 border-red-600 shadow-md overflow-hidden shrink-0">
+                <img src="/logo.png" alt="Shree Sai Classes" className="h-full w-full object-contain" />
               </div>
               <div>
                 <h3 className="font-bold text-base text-slate-900">Install Shree Sai App</h3>

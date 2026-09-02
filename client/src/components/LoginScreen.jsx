@@ -103,8 +103,8 @@ export const LoginScreen = ({ onLoginSuccess, settings }) => {
         <div className="bg-white rounded-3xl shadow-2xl border border-slate-200/80 overflow-hidden">
           {/* Header Banner */}
           <div className="bg-gradient-to-b from-blue-950 to-slate-900 px-6 pt-8 pb-6 text-center text-white relative">
-            <div className="inline-flex h-16 w-16 rounded-2xl bg-blue-900/90 p-1 items-center justify-center border-2 border-red-600 shadow-xl mb-3">
-              <GraduationCap className="h-10 w-10 text-amber-300" />
+            <div className="inline-flex h-20 w-20 rounded-2xl bg-white p-1 items-center justify-center border-2 border-red-600 shadow-xl mb-3 overflow-hidden">
+              <img src="/logo.png" alt="Shree Sai Classes" className="h-full w-full object-contain" />
             </div>
             <h1 className="text-xl font-black font-heading tracking-tight">
               {settings?.instituteName || 'SHREE SAI CLASSES'}

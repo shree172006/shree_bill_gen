@@ -69,10 +69,8 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
   <!-- Header -->
   <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #172554;padding-bottom:14px;margin-bottom:14px">
     <div style="display:flex;align-items:flex-start;gap:14px">
-      <div style="width:52px;height:52px;background:#172554;border-radius:10px;border:2px solid #dc2626;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fcd34d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
-        </svg>
+      <div style="width:60px;height:60px;background:#ffffff;border-radius:10px;border:2px solid #dc2626;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;padding:2px">
+        <img src="${window.location.origin}/logo.png" alt="Shree Sai Classes" style="width:100%;height:100%;object-fit:contain" />
       </div>
       <div>
         <h1>${instituteName}</h1>
@@ -431,8 +429,8 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
             {/* Academy Crest & Header Banner */}
             <div className="flex items-start justify-between border-b-2 border-blue-950 pb-3 mb-3 gap-3">
               <div className="flex items-start gap-3">
-                <div className="h-12 w-12 rounded-xl bg-blue-950 p-1 flex items-center justify-center border-2 border-red-600 shadow-sm shrink-0">
-                  <GraduationCap className="h-7 w-7 text-amber-300" />
+                <div className="h-14 w-14 rounded-xl bg-white p-1 flex items-center justify-center border-2 border-red-600 shadow-sm shrink-0 overflow-hidden">
+                  <img src="/logo.png" alt="Shree Sai Classes" className="h-full w-full object-contain" />
                 </div>
                 <div>
                   <h1 className="text-xl font-black text-blue-950 font-heading tracking-tight leading-none">

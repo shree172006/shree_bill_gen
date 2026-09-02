@@ -10,10 +10,16 @@
   "theme_color": "#1e3a8a",
   "icons": [
     {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
       "src": "/icon.svg",
       "sizes": "192x192 512x512",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "maskable"
     }
   ],
   "categories": ["education", "finance", "productivity"],
