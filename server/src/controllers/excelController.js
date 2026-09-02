@@ -116,7 +116,7 @@ export const downloadTemplate = (req, res) => {
 /**
  * Imports Excel data matching the official ledger schema and syncs to store
  */
-export const uploadExcel = (req, res) => {
+export const uploadExcel = async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ success: false, message: 'No Excel or CSV file uploaded.' });
   }
@@ -238,8 +238,7 @@ export const uploadExcel = (req, res) => {
       return res.status(400).json({ success: false, message: 'Could not extract valid student rows from file.' });
     }
 
-    students.unshift(...createdList);
-    Store.saveStudents(students);
+    await Store.upsertBatchAsync(createdList);
 
     res.json({
       success: true,

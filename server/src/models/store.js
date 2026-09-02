@@ -97,6 +97,35 @@ export const Store = {
     fs.writeFileSync(STUDENTS_FILE, JSON.stringify(students, null, 2));
   },
 
+  saveStudents(students) {
+    this.saveLocalStudents(students);
+  },
+
+  async upsertBatchAsync(studentsList) {
+    const local = this.getStudents();
+    for (const stud of studentsList) {
+      const idx = local.findIndex((s) => s.id === stud.id);
+      if (idx >= 0) {
+        local[idx] = stud;
+      } else {
+        local.unshift(stud);
+      }
+    }
+    this.saveLocalStudents(local);
+
+    try {
+      const dbRecords = studentsList.map(toDbStudent);
+      const { error } = await supabase.from('students').upsert(dbRecords);
+      if (error) {
+        console.error(`⚠️ Supabase batch upload error: ${error.message}`);
+      } else {
+        console.log(`✅ Batch of ${studentsList.length} students synced to Supabase Database!`);
+      }
+    } catch (err) {
+      console.error('Supabase batch exception:', err.message);
+    }
+  },
+
   // Primary: Fetch Live Students directly from Supabase Cloud Database
   async fetchStudentsAsync() {
     try {
