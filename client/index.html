@@ -29,13 +29,22 @@
     <script type="module" src="/src/main.jsx"></script>
     <script>
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').then((reg) => {
-            console.log('✅ PWA Active:', reg.scope);
-            // Check for code updates on every launch
-            reg.update();
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        if (!isLocal && window.location.protocol === 'https:') {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').then((reg) => {
+              console.log('✅ PWA Active:', reg.scope);
+              reg.update();
+            });
           });
-        });
+        } else {
+          // Auto-clean stale development service workers so Vite never gets blocked
+          navigator.serviceWorker.getRegistrations().then((registrations) => {
+            for (const registration of registrations) {
+              registration.unregister();
+            }
+          });
+        }
       }
     </script>
   </body>

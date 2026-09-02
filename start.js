@@ -39,6 +39,9 @@ console.log(`${YELLOW}🧹 Freeing ports 5000 and 5173...${RESET}`);
 killPort(5000);
 killPort(5173);
 
+// Give Windows socket a brief moment to fully release
+await new Promise((resolve) => setTimeout(resolve, 600));
+
 // Helper to spawn process cross-platform
 const spawnProcess = (command, args, cwd, prefix, color) => {
   const isWindows = process.platform === 'win32';

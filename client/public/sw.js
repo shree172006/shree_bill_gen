@@ -37,12 +37,20 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const request = event.request;
 
-  // 1. API & Backend Database calls: Never cache, always live network
-  if (request.url.includes('/api/')) {
+  // Skip non-GET, non-http, API requests, and Vite development tooling
+  if (
+    request.method !== 'GET' ||
+    !request.url.startsWith('http') ||
+    request.url.includes('/api/') ||
+    request.url.includes('@') ||
+    request.url.includes('node_modules') ||
+    request.url.includes('localhost') ||
+    request.url.includes('127.0.0.1')
+  ) {
     return;
   }
 
-  // 2. Navigation & App Code: Network-First (Fetch latest -> update cache -> fallback to cache if offline)
+  // Navigation & App Code: Network-First (Fetch latest -> update cache -> fallback to cache if offline)
   event.respondWith(
     fetch(request)
       .then((networkResponse) => {
@@ -54,15 +62,15 @@ self.addEventListener('fetch', (event) => {
         }
         return networkResponse;
       })
-      .catch(() => {
+      .catch(async () => {
         // Offline Fallback
-        return caches.match(request).then((cached) => {
-          if (cached) return cached;
-          if (request.mode === 'navigate') {
-            return caches.match('/index.html');
-          }
-          return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
-        });
+        const cached = await caches.match(request);
+        if (cached) return cached;
+        if (request.mode === 'navigate') {
+          const fallback = await caches.match('/index.html');
+          if (fallback) return fallback;
+        }
+        return new Response('Offline', { status: 200, headers: { 'Content-Type': 'text/plain' } });
       })
   );
 });
