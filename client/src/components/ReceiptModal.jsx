@@ -6,7 +6,6 @@ import {
   Share2,
   GraduationCap,
   Loader2,
-  MessageCircle,
   CheckCircle2,
 } from 'lucide-react';
 import { formatCurrency, formatDate } from '../utils/formatters';
@@ -320,51 +319,43 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
         type: 'application/pdf',
       });
 
-      // If mobile browser supports direct file sharing (WhatsApp / Chat apps)
+      // Universal Share: Native Web Share API (WhatsApp, Telegram, Gmail, Drive, Messages, AirDrop, etc.)
       if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
         await navigator.share({
           files: [pdfFile],
           title: `Fee Receipt - ${student.studentName}`,
           text: `Official Fee Receipt for ${student.studentName} (${settings?.instituteName || 'Shree Sai Classes'})`,
         });
+      } else if (navigator.share) {
+        // Fallback for browsers supporting sharing text/URL
+        const fileUrl = URL.createObjectURL(result.blob);
+        try {
+          await navigator.share({
+            title: `Fee Receipt - ${student.studentName}`,
+            text: `Official Fee Receipt for ${student.studentName}`,
+            url: fileUrl,
+          });
+        } catch (shareErr) {
+          if (shareErr.name !== 'AbortError') {
+            result.pdfInstance.save(result.fileName);
+          }
+        } finally {
+          setTimeout(() => URL.revokeObjectURL(fileUrl), 10000);
+        }
       } else {
+        // Fallback for desktop browsers without Web Share: download file directly
         result.pdfInstance.save(result.fileName);
-        handleWhatsAppTextShare();
       }
     } catch (err) {
       if (err.name !== 'AbortError') {
         console.error('Share error:', err);
-        handleWhatsAppTextShare();
+        try {
+          const result = await generatePDFBlob();
+          if (result) result.pdfInstance.save(result.fileName);
+        } catch (_) {}
       }
     } finally {
       setIsGenerating(false);
-    }
-  };
-
-  const handleWhatsAppTextShare = () => {
-    const text = `*OFFICIAL FEE RECEIPT - ${settings?.instituteName || 'SHREE SAI CLASSES'}*\n\nStudent: *${student.studentName}*\nReceipt No: *${student.receiptNo}*\nStandard: ${student.standard}\nTotal Fees: ${formatCurrency(student.grandTotal)}\nAmount Paid: ${formatCurrency(student.totalPaid)}\n*Outstanding Balance: ${formatCurrency(student.balanceLeft)}*\nStatus: *${student.status}*\n\n_Thank you for choosing Shree Sai Classes!_`;
-    const cleanPhone = (student.contactNo || student.parentContact || '').replace(/[^0-9]/g, '');
-
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    const whatsappUrl = cleanPhone
-      ? isMobile
-        ? `whatsapp://send?phone=91${cleanPhone}&text=${encodeURIComponent(text)}`
-        : `https://web.whatsapp.com/send?phone=91${cleanPhone}&text=${encodeURIComponent(text)}`
-      : isMobile
-      ? `whatsapp://send?text=${encodeURIComponent(text)}`
-      : `https://web.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-
-    const fallbackUrl = cleanPhone
-      ? `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(text)}`
-      : `https://wa.me/?text=${encodeURIComponent(text)}`;
-
-    try {
-      window.location.href = whatsappUrl;
-      setTimeout(() => {
-        window.open(fallbackUrl, '_blank');
-      }, 500);
-    } catch (_) {
-      window.open(fallbackUrl, '_blank');
     }
   };
 
@@ -381,12 +372,12 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* Share PDF directly to WhatsApp / Mobile Apps */}
+            {/* Share PDF anywhere (WhatsApp, Telegram, Email, Drive, AirDrop, etc.) */}
             <button
               onClick={handleSharePDF}
               disabled={isGenerating}
               className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 text-xs font-bold text-emerald-900 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300 rounded-lg transition-colors active:scale-95 disabled:opacity-50"
-              title="Share PDF Receipt directly to WhatsApp / Mobile Apps"
+              title="Share PDF Receipt (WhatsApp, Telegram, Email, Drive, etc.)"
             >
               {isGenerating ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -394,16 +385,6 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
                 <Share2 className="h-3.5 w-3.5" />
               )}
               <span>Share PDF</span>
-            </button>
-
-            {/* Direct WhatsApp Chat */}
-            <button
-              onClick={handleWhatsAppTextShare}
-              className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 text-xs font-bold text-green-800 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg transition-colors active:scale-95"
-              title="Open WhatsApp Chat with Bill Summary"
-            >
-              <MessageCircle className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">WhatsApp</span>
             </button>
 
             {/* Save PDF */}
