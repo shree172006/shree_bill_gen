@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Store, normalizeStandard } from '../models/store.js';
+import { Store, normalizeStandard, generateNextReceiptNo } from '../models/store.js';
 
 // Section filtering helper
 export const isMatchingSection = (rawStd = '', section = 'all') => {
@@ -26,24 +26,30 @@ export const getStudents = async (req, res) => {
     filtered = filtered.filter((s) => isMatchingSection(s.standard, section));
   }
 
-  if (search) {
-    const q = search.toLowerCase().trim();
+  // Standard dropdown filter
+  if (standard && standard !== 'ALL') {
     filtered = filtered.filter(
-      (s) =>
-        s.studentName?.toLowerCase().includes(q) ||
-        s.rollNo?.toLowerCase().includes(q) ||
-        s.contactNo?.toLowerCase().includes(q) ||
-        s.courseName?.toLowerCase().includes(q) ||
-        s.receiptNo?.toLowerCase().includes(q)
+      (s) => (s.standard || '').toLowerCase() === standard.toLowerCase()
     );
   }
 
-  if (status && status !== 'all') {
-    filtered = filtered.filter((s) => s.status?.toUpperCase() === status.toUpperCase());
+  // Status Filter
+  if (status && status !== 'ALL') {
+    filtered = filtered.filter((s) => s.status === status);
   }
 
-  if (standard && standard !== 'all') {
-    filtered = filtered.filter((s) => s.standard === standard);
+  // Search Query Filter
+  if (search && search.trim()) {
+    const q = search.toLowerCase().trim();
+    filtered = filtered.filter(
+      (s) =>
+        (s.studentName || '').toLowerCase().includes(q) ||
+        (s.receiptNo || '').toLowerCase().includes(q) ||
+        (s.fatherContact || '').includes(q) ||
+        (s.motherContact || '').includes(q) ||
+        (s.contactNo || '').includes(q) ||
+        (s.parentContact || '').includes(q)
+    );
   }
 
   res.json({ success: true, count: filtered.length, data: filtered });
@@ -64,25 +70,40 @@ export const createStudent = async (req, res) => {
   const year = now.getFullYear();
 
   const id = `stud-${uuidv4()}`;
-  const receiptNo = `SSC-REC-${year}-${String(students.length + 1).padStart(3, '0')}`;
+  const receiptNo = generateNextReceiptNo(students, year);
+
+  const fatherContact = String(req.body.fatherContact || req.body.contactNo || '').trim();
+  const motherContact = String(req.body.motherContact || req.body.parentContact || '').trim();
+
+  // Attach installment receipt numbers e.g. SSC-REC-2026-001-01, SSC-REC-2026-001-02
+  const installments = (req.body.installments || []).map((inst, idx) => {
+    const sNo = inst.srNo || idx + 1;
+    return {
+      ...inst,
+      srNo: sNo,
+      receiptNo: `${receiptNo}-${String(sNo).padStart(2, '0')}`,
+    };
+  });
 
   const rawStudent = {
     id,
     receiptNo,
     studentName: req.body.studentName || 'Student Name',
-    rollNo: req.body.rollNo || `SSC-${year}-${String(students.length + 1).padStart(3, '0')}`,
-    contactNo: req.body.contactNo || '',
-    parentContact: req.body.parentContact || '',
+    rollNo: req.body.rollNo || receiptNo,
+    fatherContact,
+    motherContact,
+    contactNo: fatherContact,
+    parentContact: motherContact,
     academicYear: req.body.academicYear || `${year}-${String(year + 1).slice(2)}`,
-    standard: req.body.standard || 'SYJC (12th Commerce)',
+    standard: req.body.standard || 'Class 10',
     board: req.body.board || 'CBSE',
-    courseName: req.body.courseName || `${req.body.standard || 'SYJC'} Course Package`,
+    courseName: req.body.courseName || `${req.body.standard || 'Class 10'} Package`,
     admissionDate: req.body.admissionDate || now.toISOString().split('T')[0],
     feesDate: req.body.feesDate || now.toISOString().split('T')[0],
     reportDate: req.body.reportDate || now.toISOString().split('T')[0],
     totalFees: parseFloat(req.body.totalFees || 0),
     discount: parseFloat(req.body.discount || 0),
-    installments: req.body.installments || [],
+    installments,
     notes: req.body.notes || '',
   };
 
@@ -97,10 +118,32 @@ export const updateStudent = async (req, res) => {
   const index = students.findIndex((s) => s.id === req.params.id);
 
   if (index === 0 || index > 0) {
+    const existing = students[index];
+    const recNo = existing.receiptNo || generateNextReceiptNo(students);
+
+    const fatherContact = String(req.body.fatherContact !== undefined ? req.body.fatherContact : (req.body.contactNo !== undefined ? req.body.contactNo : existing.fatherContact || '')).trim();
+    const motherContact = String(req.body.motherContact !== undefined ? req.body.motherContact : (req.body.parentContact !== undefined ? req.body.parentContact : existing.motherContact || '')).trim();
+
+    // Ensure all installments have their proper sequential installment receipt number
+    const updatedInstallments = (req.body.installments || existing.installments || []).map((inst, idx) => {
+      const sNo = inst.srNo || idx + 1;
+      return {
+        ...inst,
+        srNo: sNo,
+        receiptNo: inst.receiptNo || `${recNo}-${String(sNo).padStart(2, '0')}`,
+      };
+    });
+
     const updated = Store.recalculate({
-      ...students[index],
+      ...existing,
       ...req.body,
-      id: students[index].id,
+      fatherContact,
+      motherContact,
+      contactNo: fatherContact,
+      parentContact: motherContact,
+      installments: updatedInstallments,
+      id: existing.id,
+      receiptNo: recNo,
     });
     await Store.upsertStudentAsync(updated);
     return res.json({ success: true, data: updated });

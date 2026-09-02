@@ -106,6 +106,22 @@ export const normalizeCourseName = (standard, courseName) => {
   return `${standard} - CBSE / ICSE / SSC (Maths & Science Package)`;
 };
 
+export const generateNextReceiptNo = (students = [], currentYear = new Date().getFullYear()) => {
+  const pattern = new RegExp(`^SSC-REC-${currentYear}-(\\d+)`, 'i');
+  let maxSeq = 0;
+  for (const s of students) {
+    if (s.receiptNo) {
+      const m = s.receiptNo.match(pattern);
+      if (m) {
+        const num = parseInt(m[1], 10);
+        if (num > maxSeq) maxSeq = num;
+      }
+    }
+  }
+  const nextSeq = maxSeq + 1;
+  return `SSC-REC-${currentYear}-${String(nextSeq).padStart(3, '0')}`;
+};
+
 // Field Mapping Helpers between camelCase (App) and snake_case (Supabase)
 const toAppStudent = (dbRow) => {
   const standard = normalizeStandard(dbRow.standard || 'Class 10');
@@ -115,22 +131,35 @@ const toAppStudent = (dbRow) => {
   const admissionDate = normalizeExcelDate(dbRow.admission_date || dbRow.admissionDate);
   const feesDate = normalizeExcelDate(dbRow.fees_date || dbRow.feesDate);
   const reportDate = normalizeExcelDate(dbRow.report_date || dbRow.reportDate);
-  const installments = (dbRow.installments || []).map((inst) => ({
-    ...inst,
-    dueDate: normalizeExcelDate(inst.dueDate),
-    paidDate: normalizeExcelDate(inst.paidDate),
-  }));
+  const receiptNo = dbRow.receipt_no || dbRow.receiptNo;
+
+  const installments = (dbRow.installments || []).map((inst, idx) => {
+    const sNo = inst.srNo || idx + 1;
+    const instReceiptNo = inst.receiptNo || (receiptNo ? `${receiptNo}-${String(sNo).padStart(2, '0')}` : '');
+    return {
+      ...inst,
+      srNo: sNo,
+      receiptNo: instReceiptNo,
+      dueDate: normalizeExcelDate(inst.dueDate),
+      paidDate: normalizeExcelDate(inst.paidDate),
+    };
+  });
+
+  const fatherContact = dbRow.father_contact || dbRow.fatherContact || dbRow.contact_no || dbRow.contactNo || '';
+  const motherContact = dbRow.mother_contact || dbRow.motherContact || dbRow.parent_contact || dbRow.parentContact || '';
 
   return {
     id: dbRow.id,
-    receiptNo: dbRow.receipt_no || dbRow.receiptNo,
+    receiptNo,
     studentName: dbRow.student_name || dbRow.studentName,
     standard,
     board,
     courseName,
     academicYear: dbRow.academic_year || dbRow.academicYear || '2026-27',
-    contactNo: dbRow.contact_no || dbRow.contactNo || '',
-    parentContact: dbRow.parent_contact || dbRow.parentContact || '',
+    fatherContact,
+    motherContact,
+    contactNo: fatherContact,
+    parentContact: motherContact,
     admissionDate,
     feesDate,
     reportDate,
@@ -152,9 +181,9 @@ const toDbStudent = (appStudent) => ({
   standard: appStudent.standard,
   board: appStudent.board || 'CBSE',
   course_name: appStudent.courseName,
-  academic_year: appStudent.academicYear || '2024-25',
-  contact_no: appStudent.contactNo || '',
-  parent_contact: appStudent.parentContact || '',
+  academic_year: appStudent.academicYear || '2026-27',
+  contact_no: appStudent.fatherContact || appStudent.contactNo || '',
+  parent_contact: appStudent.motherContact || appStudent.parentContact || '',
   admission_date: appStudent.admissionDate,
   fees_date: appStudent.feesDate,
   report_date: appStudent.reportDate,

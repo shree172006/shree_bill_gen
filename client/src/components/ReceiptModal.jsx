@@ -20,6 +20,9 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
     (i) => i.status === 'PAID'
   );
 
+  const latestPaid = paidInstallments.length > 0 ? paidInstallments[paidInstallments.length - 1] : null;
+  const activeReceiptNo = latestPaid?.receiptNo || (student.receiptNo ? `${student.receiptNo}-01` : 'SSC-REC-001-01');
+
   const handlePrint = () => {
     window.print();
   };
@@ -39,14 +42,19 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
     ];
 
     const rowsHTML = inst.length > 0
-      ? inst.map((i, idx) => `
+      ? inst.map((i, idx) => {
+          const sNo = i.srNo || idx + 1;
+          const instRecNo = i.receiptNo || `${student.receiptNo}-${String(sNo).padStart(2, '0')}`;
+          return `
           <tr style="background:${idx % 2 === 0 ? '#f0fdf4' : '#ffffff'}">
             <td style="padding:7px 10px;font-weight:700;color:#1e293b;font-size:11px;border-bottom:1px solid #e2e8f0">Installment</td>
+            <td style="padding:7px 10px;font-family:monospace;font-weight:700;color:#172554;font-size:10px;border-bottom:1px solid #e2e8f0">${instRecNo}</td>
             <td style="padding:7px 10px;color:#475569;font-size:11px;border-bottom:1px solid #e2e8f0">${formatDate(i.paidDate || i.dueDate)}</td>
             <td style="padding:7px 10px;color:#1e293b;font-weight:600;font-size:11px;border-bottom:1px solid #e2e8f0">${i.paymentMode || 'Cash'}</td>
             <td style="padding:7px 10px;text-align:right;font-weight:900;color:#15803d;font-size:11px;border-bottom:1px solid #e2e8f0">${formatCurrency(i.amount)}</td>
-          </tr>`).join('')
-      : `<tr><td colspan="4" style="padding:14px;text-align:center;color:#94a3b8;font-style:italic;font-size:11px">No payments cleared yet.</td></tr>`;
+          </tr>`;
+        }).join('')
+      : `<tr><td colspan="5" style="padding:14px;text-align:center;color:#94a3b8;font-style:italic;font-size:11px">No payments cleared yet.</td></tr>`;
 
     const discountRow = student.discount > 0
       ? `<div style="display:flex;justify-content:space-between;padding:8px 12px;background:#ecfdf5;border-bottom:1px solid #e2e8f0">
@@ -81,7 +89,7 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
     </div>
     <div style="text-align:right;flex-shrink:0">
       <div style="background:#dc2626;color:#fff;font-weight:900;font-size:11px;letter-spacing:1px;padding:4px 10px;border-radius:4px;text-transform:uppercase">FEE RECEIPT</div>
-      <p style="font-size:12px;font-weight:700;font-family:monospace;color:#172554;margin-top:5px">${student.receiptNo}</p>
+      <p style="font-size:12px;font-weight:700;font-family:monospace;color:#172554;margin-top:5px">${activeReceiptNo}</p>
     </div>
   </div>
 
@@ -107,10 +115,14 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
         <div style="display:inline-block;background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700">${student.standard}</div>
       </div>
       <div>
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;margin-bottom:2px">Contact Number</div>
-        <div style="font-size:12px;font-weight:700;color:#1e293b">${student.contactNo || student.parentContact || '-'}</div>
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;margin-bottom:2px">Father Contact No</div>
+        <div style="font-size:12px;font-weight:700;color:#1e293b">${student.fatherContact || student.contactNo || '-'}</div>
       </div>
-      <div style="grid-column:1/-1">
+      <div>
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;margin-bottom:2px">Mother Contact No</div>
+        <div style="font-size:12px;font-weight:700;color:#1e293b">${student.motherContact || student.parentContact || '-'}</div>
+      </div>
+      <div>
         <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;margin-bottom:2px">Course &amp; Subject Package</div>
         <div style="font-size:12px;font-weight:700;color:#1e293b">${student.courseName}</div>
       </div>
@@ -146,6 +158,7 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
         <thead>
           <tr style="background:#f1f5f9">
             <th style="padding:7px 10px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;border-bottom:1px solid #e2e8f0">Installment</th>
+            <th style="padding:7px 10px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;border-bottom:1px solid #e2e8f0">Receipt No.</th>
             <th style="padding:7px 10px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;border-bottom:1px solid #e2e8f0">Payment Date</th>
             <th style="padding:7px 10px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;border-bottom:1px solid #e2e8f0">Payment Mode</th>
             <th style="padding:7px 10px;text-align:right;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;border-bottom:1px solid #e2e8f0">Amount Paid</th>
@@ -288,7 +301,7 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
     return {
       blob: pdf.output('blob'),
       pdfInstance: pdf,
-      fileName: `Fee_Receipt_${student.receiptNo || student.studentName}.pdf`,
+      fileName: `Fee_Receipt_${activeReceiptNo || student.studentName}.pdf`,
     };
   };
 
@@ -300,13 +313,14 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
         result.pdfInstance.save(result.fileName);
       }
     } catch (err) {
-      console.error('PDF generation error:', err);
-      window.print();
+      console.error('Download error:', err);
+      alert('Could not download PDF. Please use the Print button instead.');
     } finally {
       setIsGenerating(false);
     }
   };
 
+  // Modern Universal Share PDF handler
   const handleSharePDF = async () => {
     try {
       setIsGenerating(true);
@@ -317,40 +331,24 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
         type: 'application/pdf',
       });
 
-      // Universal Share: Native Web Share API (WhatsApp, Telegram, Gmail, Drive, Messages, AirDrop, etc.)
+      // 1. If Web Share API supports file sharing, open device share sheet
       if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
         await navigator.share({
           files: [pdfFile],
           title: `Fee Receipt - ${student.studentName}`,
-          text: `Official Fee Receipt for ${student.studentName} (${settings?.instituteName || 'Shree Sai Classes'})`,
+          text: `Fee Receipt for ${student.studentName} (${activeReceiptNo}) from ${settings?.instituteName || 'Shree Sai Classes'}.`,
         });
-      } else if (navigator.share) {
-        // Fallback for browsers supporting sharing text/URL
-        const fileUrl = URL.createObjectURL(result.blob);
-        try {
-          await navigator.share({
-            title: `Fee Receipt - ${student.studentName}`,
-            text: `Official Fee Receipt for ${student.studentName}`,
-            url: fileUrl,
-          });
-        } catch (shareErr) {
-          if (shareErr.name !== 'AbortError') {
-            result.pdfInstance.save(result.fileName);
-          }
-        } finally {
-          setTimeout(() => URL.revokeObjectURL(fileUrl), 10000);
-        }
-      } else {
-        // Fallback for desktop browsers without Web Share: download file directly
-        result.pdfInstance.save(result.fileName);
+        return;
       }
+
+      // 2. Fallback: Automatically download file and notify user
+      result.pdfInstance.save(result.fileName);
+      alert('PDF receipt downloaded! You can now attach and share it via WhatsApp, Telegram, Email, or Drive.');
     } catch (err) {
       if (err.name !== 'AbortError') {
         console.error('Share error:', err);
-        try {
-          const result = await generatePDFBlob();
-          if (result) result.pdfInstance.save(result.fileName);
-        } catch (_) {}
+        alert('Could not open share menu. Downloading the PDF instead.');
+        handleDownloadPDF();
       }
     } finally {
       setIsGenerating(false);
@@ -365,7 +363,7 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
           <div className="flex items-center gap-2">
             <span className="font-bold text-slate-800 text-xs sm:text-sm">Fee Receipt Preview</span>
             <span className="text-[11px] font-mono font-bold text-blue-900 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
-              {student.receiptNo}
+              {activeReceiptNo}
             </span>
           </div>
 
@@ -453,7 +451,7 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
                   FEE RECEIPT
                 </span>
                 <p className="text-xs font-mono font-bold text-blue-950 mt-1">
-                  {student.receiptNo}
+                  {activeReceiptNo}
                 </p>
               </div>
             </div>
@@ -491,11 +489,16 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
                 </div>
 
                 <div>
-                  <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-500">Contact Number</span>
-                  <span className="font-bold text-slate-900 text-xs">{student.contactNo || student.parentContact || '-'}</span>
+                  <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-500">Father Contact No</span>
+                  <span className="font-bold text-slate-900 text-xs">{student.fatherContact || student.contactNo || '-'}</span>
                 </div>
 
-                <div className="col-span-2">
+                <div>
+                  <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-500">Mother Contact No</span>
+                  <span className="font-bold text-slate-900 text-xs">{student.motherContact || student.parentContact || '-'}</span>
+                </div>
+
+                <div>
                   <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-500">Course & Subject Package</span>
                   <span className="font-bold text-slate-900 text-xs">{student.courseName}</span>
                 </div>
@@ -540,6 +543,7 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
                   <thead className="bg-slate-100 text-[9px] font-bold text-slate-600 uppercase border-b border-slate-200">
                     <tr>
                       <th className="px-3 py-1.5">Installment</th>
+                      <th className="px-3 py-1.5">Receipt No.</th>
                       <th className="px-3 py-1.5">Payment Date</th>
                       <th className="px-3 py-1.5">Payment Mode</th>
                       <th className="px-3 py-1.5 text-right">Amount Paid</th>
@@ -547,30 +551,37 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {paidInstallments.length > 0 ? (
-                      paidInstallments.map((inst, idx) => (
-                        <tr key={idx} className="bg-emerald-50/30">
-                          <td className="px-3 py-1.5 font-bold text-slate-800">
-                            Installment
-                          </td>
-                          <td className="px-3 py-1.5 text-slate-700 font-medium text-[11px]">
-                            {formatDate(inst.paidDate || inst.dueDate)}
-                          </td>
-                          <td className="px-3 py-1.5 text-slate-800 font-semibold text-[11px]">
-                            {inst.paymentMode || 'Cash'}
-                            {inst.transactionDetails && inst.transactionDetails !== 'Cash' && inst.transactionDetails !== 'Counter Payment' && (
-                              <span className="block text-[9px] text-slate-500 font-normal">
-                                {inst.transactionDetails}
-                              </span>
-                            )}
-                          </td>
-                          <td className="px-3 py-1.5 text-right font-black text-emerald-700">
-                            {formatCurrency(inst.amount)}
-                          </td>
-                        </tr>
-                      ))
+                      paidInstallments.map((inst, idx) => {
+                        const sNo = inst.srNo || idx + 1;
+                        const instRecNo = inst.receiptNo || `${student.receiptNo}-${String(sNo).padStart(2, '0')}`;
+                        return (
+                          <tr key={idx} className="bg-emerald-50/30">
+                            <td className="px-3 py-1.5 font-bold text-slate-800">
+                              Installment
+                            </td>
+                            <td className="px-3 py-1.5 font-mono font-bold text-blue-950 text-[10px]">
+                              {instRecNo}
+                            </td>
+                            <td className="px-3 py-1.5 text-slate-700 font-medium text-[11px]">
+                              {formatDate(inst.paidDate || inst.dueDate)}
+                            </td>
+                            <td className="px-3 py-1.5 text-slate-800 font-semibold text-[11px]">
+                              {inst.paymentMode || 'Cash'}
+                              {inst.transactionDetails && inst.transactionDetails !== 'Cash' && inst.transactionDetails !== 'Counter Payment' && (
+                                <span className="block text-[9px] text-slate-500 font-normal">
+                                  {inst.transactionDetails}
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-3 py-1.5 text-right font-black text-emerald-700">
+                              {formatCurrency(inst.amount)}
+                            </td>
+                          </tr>
+                        );
+                      })
                     ) : (
                       <tr>
-                        <td colSpan={4} className="px-3 py-3 text-center text-slate-400 font-medium italic text-[11px]">
+                        <td colSpan={5} className="px-3 py-3 text-center text-slate-400 font-medium italic text-[11px]">
                           No payments cleared yet.
                         </td>
                       </tr>

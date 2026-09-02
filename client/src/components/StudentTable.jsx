@@ -165,13 +165,20 @@ export const StudentTable = ({
                 </div>
 
                 {/* Course & Contact */}
-                <p className="text-xs text-slate-600 font-medium truncate mb-2">{student.courseName}</p>
-                {student.contactNo && (
-                  <div className="flex items-center gap-1 text-[11px] text-slate-500 mb-2.5">
-                    <Phone className="h-3 w-3 text-slate-400" />
-                    <span>{student.contactNo}</span>
-                  </div>
-                )}
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500 mb-2.5">
+                  {(student.fatherContact || student.contactNo) && (
+                    <span className="inline-flex items-center gap-1">
+                      <Phone className="h-3 w-3 text-blue-600" />
+                      <span><strong>Father:</strong> {student.fatherContact || student.contactNo}</span>
+                    </span>
+                  )}
+                  {(student.motherContact || student.parentContact) && (
+                    <span className="inline-flex items-center gap-1">
+                      <Phone className="h-3 w-3 text-rose-500" />
+                      <span><strong>Mother:</strong> {student.motherContact || student.parentContact}</span>
+                    </span>
+                  )}
+                </div>
 
                 {/* 3-Column Financial Summary Grid */}
                 <div className="grid grid-cols-3 gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200 mb-2.5 text-center">
@@ -277,12 +284,20 @@ export const StudentTable = ({
                       <span className="block font-bold text-slate-900 text-sm">
                         {student.studentName}
                       </span>
-                      {student.contactNo && (
-                        <span className="inline-flex items-center gap-1 text-[11px] text-slate-500 mt-0.5">
-                          <Phone className="h-3 w-3 text-slate-400" />
-                          {student.contactNo}
-                        </span>
-                      )}
+                      <div className="flex flex-col gap-0.5 mt-0.5 text-[11px] text-slate-500">
+                        {(student.fatherContact || student.contactNo) && (
+                          <span className="inline-flex items-center gap-1">
+                            <Phone className="h-3 w-3 text-blue-600" />
+                            <span><strong>Father:</strong> {student.fatherContact || student.contactNo}</span>
+                          </span>
+                        )}
+                        {(student.motherContact || student.parentContact) && (
+                          <span className="inline-flex items-center gap-1">
+                            <Phone className="h-3 w-3 text-rose-500" />
+                            <span><strong>Mother:</strong> {student.motherContact || student.parentContact}</span>
+                          </span>
+                        )}
+                      </div>
                     </td>
 
                     {/* Std */}

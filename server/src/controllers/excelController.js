@@ -179,8 +179,8 @@ export const uploadExcel = async (req, res) => {
       const rawAdmDate = getField(row, ['Date Of Admission', 'Admission Date']);
       const admissionDate = normalizeExcelDate(rawAdmDate) || todayStr;
 
-      const contactNo = String(getField(row, ['Contact No', 'Contact No.', 'Student Mobile', 'Mobile', 'Phone', 'Contact']) || '').trim();
-      const parentContact = String(getField(row, ['Parent Mobile', 'Parent Contact', 'Father Contact', 'Mother Contact', 'Parents Contact']) || '').trim();
+      const fatherContact = String(getField(row, ['Father Mobile', 'Father Contact', 'Father Phone', 'Father', 'Student Mobile', 'Student Contact', 'Mobile', 'Phone', 'Contact No', 'Contact No.', 'Contact']) || '').trim();
+      const motherContact = String(getField(row, ['Mother Mobile', 'Mother Contact', 'Mother Phone', 'Mother', 'Parent Mobile', 'Parent Contact', 'Parents Contact']) || '').trim();
 
       const academicYear = getField(row, ['Academic Year', 'Year', 'Batch', 'Session']) || `${now.getFullYear()}-${String(now.getFullYear() + 1).slice(-2)}`;
 
@@ -205,6 +205,7 @@ export const uploadExcel = async (req, res) => {
         if (receivedAmt > 0) {
           installments.push({
             srNo: i,
+            receiptNo: receiptNoInst,
             dueDate: receivedDate,
             paidDate: receivedDate,
             status: 'PAID',
@@ -220,8 +221,10 @@ export const uploadExcel = async (req, res) => {
       const pendingBalance = Math.max(0, actualFees - totalPaid);
 
       if (pendingBalance > 0) {
+        const sNo = installments.length + 1;
         installments.push({
-          srNo: installments.length + 1,
+          srNo: sNo,
+          receiptNo: `${regNo}-${String(sNo).padStart(2, '0')}`,
           dueDate: dueDateVal || new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0],
           paidDate: '',
           status: 'PENDING',
@@ -236,8 +239,10 @@ export const uploadExcel = async (req, res) => {
         receiptNo: regNo,
         studentName,
         rollNo: regNo,
-        contactNo,
-        parentContact,
+        fatherContact,
+        motherContact,
+        contactNo: fatherContact,
+        parentContact: motherContact,
         academicYear,
         standard,
         board,

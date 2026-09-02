@@ -20,6 +20,8 @@ export const StudentModal = ({ isOpen, onClose, onSave, student, currentUser }) 
   const [formData, setFormData] = useState({
     studentName: '',
     rollNo: '',
+    fatherContact: '',
+    motherContact: '',
     contactNo: '',
     parentContact: '',
     standard: defaultStandard,
@@ -42,14 +44,27 @@ export const StudentModal = ({ isOpen, onClose, onSave, student, currentUser }) 
       const isCollege = std.includes('SYJC') || std.includes('FYJC');
       const brd = student.board || (isCollege ? 'HSC' : 'CBSE');
       const adm = parseAnyDateToISO(student.admissionDate);
-      const insts = (student.installments || []).map((i) => ({
-        ...i,
-        dueDate: parseAnyDateToISO(i.dueDate),
-        paidDate: parseAnyDateToISO(i.paidDate),
-      }));
+      const recNo = student.receiptNo || 'SSC-REC';
+      const fatherContact = student.fatherContact || student.contactNo || '';
+      const motherContact = student.motherContact || student.parentContact || '';
+
+      const insts = (student.installments || []).map((i, idx) => {
+        const sNo = i.srNo || idx + 1;
+        return {
+          ...i,
+          srNo: sNo,
+          receiptNo: i.receiptNo || `${recNo}-${String(sNo).padStart(2, '0')}`,
+          dueDate: parseAnyDateToISO(i.dueDate),
+          paidDate: parseAnyDateToISO(i.paidDate),
+        };
+      });
 
       setFormData({
         ...student,
+        fatherContact,
+        motherContact,
+        contactNo: fatherContact,
+        parentContact: motherContact,
         standard: std,
         board: brd,
         courseName: crs,
@@ -121,14 +136,17 @@ export const StudentModal = ({ isOpen, onClose, onSave, student, currentUser }) 
     const remainder = grandTotal - perInst * n;
     const today = new Date();
 
+    const recNo = formData.receiptNo || 'SSC-REC';
     const newInst = [];
     for (let i = 0; i < n; i++) {
       const d = new Date();
       d.setDate(today.getDate() + i * 30);
       const amt = i === n - 1 ? perInst + remainder : perInst;
+      const sNo = i + 1;
 
       newInst.push({
-        srNo: i + 1,
+        srNo: sNo,
+        receiptNo: `${recNo}-${String(sNo).padStart(2, '0')}`,
         dueDate: d.toISOString().split('T')[0],
         status: i === 0 ? 'PAID' : 'PENDING',
         paidDate: i === 0 ? today.toISOString().split('T')[0] : '',
@@ -148,6 +166,11 @@ export const StudentModal = ({ isOpen, onClose, onSave, student, currentUser }) 
     if (field === 'status' && val === 'PAID' && !updated[idx].paidDate) {
       updated[idx].paidDate = new Date().toISOString().split('T')[0];
       if (!updated[idx].paymentMode) updated[idx].paymentMode = 'Cash';
+      const recNo = formData.receiptNo || 'SSC-REC';
+      const sNo = updated[idx].srNo || idx + 1;
+      if (!updated[idx].receiptNo) {
+        updated[idx].receiptNo = `${recNo}-${String(sNo).padStart(2, '0')}`;
+      }
     }
 
     setFormData({ ...formData, installments: updated });
@@ -155,13 +178,16 @@ export const StudentModal = ({ isOpen, onClose, onSave, student, currentUser }) 
 
   const handleAddInstallment = () => {
     const d = new Date();
-    d.setDate(d.getDate() + (formData.installments.length + 1) * 30);
+    const nextSrNo = formData.installments.length + 1;
+    const recNo = formData.receiptNo || 'SSC-REC';
+    d.setDate(d.getDate() + nextSrNo * 30);
     setFormData({
       ...formData,
       installments: [
         ...formData.installments,
         {
-          srNo: formData.installments.length + 1,
+          srNo: nextSrNo,
+          receiptNo: `${recNo}-${String(nextSrNo).padStart(2, '0')}`,
           dueDate: d.toISOString().split('T')[0],
           status: 'PENDING',
           amount: 5000,
@@ -314,24 +340,24 @@ export const StudentModal = ({ isOpen, onClose, onSave, student, currentUser }) 
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Student Mobile</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Father Contact No *</label>
                 <input
                   type="text"
-                  placeholder="98XXXXXXXX"
-                  value={formData.contactNo}
-                  onChange={(e) => setFormData({ ...formData, contactNo: e.target.value })}
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-800 focus:outline-none"
+                  placeholder="98XXXXXXXX (Father Mobile)"
+                  value={formData.fatherContact || formData.contactNo || ''}
+                  onChange={(e) => setFormData({ ...formData, fatherContact: e.target.value, contactNo: e.target.value })}
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-800 focus:outline-none font-medium"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Parent Mobile</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Mother Contact No</label>
                 <input
                   type="text"
-                  placeholder="98XXXXXXXX"
-                  value={formData.parentContact}
-                  onChange={(e) => setFormData({ ...formData, parentContact: e.target.value })}
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-800 focus:outline-none"
+                  placeholder="98XXXXXXXX (Mother Mobile)"
+                  value={formData.motherContact || formData.parentContact || ''}
+                  onChange={(e) => setFormData({ ...formData, motherContact: e.target.value, parentContact: e.target.value })}
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-800 focus:outline-none font-medium"
                 />
               </div>
 
