@@ -9,8 +9,6 @@ import {
   MessageCircle,
   CheckCircle2,
 } from 'lucide-react';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 import { formatCurrency, formatDate } from '../utils/formatters';
 
 export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
@@ -30,6 +28,12 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
   const generatePDFBlob = async () => {
     if (!receiptRef.current) return null;
     const element = receiptRef.current;
+
+    // Dynamic lazy-load for instant performance & zero lag
+    const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
+      import('html2canvas'),
+      import('jspdf'),
+    ]);
 
     const canvas = await html2canvas(element, {
       scale: 2.5,
