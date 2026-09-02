@@ -11,7 +11,7 @@ import {
   Clock,
   Sparkles,
 } from 'lucide-react';
-import { formatCurrency } from '../utils/formatters';
+import { formatCurrency, formatDate } from '../utils/formatters';
 
 export const StudentTable = ({
   students,
