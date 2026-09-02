@@ -1,0 +1,36 @@
+{
+  "name": "Shree Sai Classes - Billing & Fee Management",
+  "short_name": "Shree Sai",
+  "description": "Automated Billing, Multi-Installment Tracking, and PDF Receipts for Shree Sai Classes",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#1e3a8a",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "finance", "productivity"],
+  "shortcuts": [
+    {
+      "name": "New Admission",
+      "short_name": "New Student",
+      "description": "Record a new student admission and installments",
+      "url": "/#new-student",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Import Excel",
+      "short_name": "Excel Sync",
+      "description": "Sync student fees from Excel",
+      "url": "/#import-excel",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192" }]
+    }
+  ]
+}

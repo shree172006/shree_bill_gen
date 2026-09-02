@@ -1,0 +1,25 @@
+{
+  "name": "shree-sai-billing-suite",
+  "version": "1.0.0",
+  "description": "Shree Sai Classes Automated Billing and Fee Management System",
+  "type": "module",
+  "main": "start.js",
+  "scripts": {
+    "start": "node start.js",
+    "prod": "node server/src/server.js",
+    "build": "npm --prefix client run build",
+    "dev": "node start.js",
+    "server": "node server/src/server.js",
+    "client": "npm --prefix client run dev"
+  },
+  "keywords": [
+    "billing",
+    "fee-management",
+    "shree-sai-classes",
+    "pwa",
+    "react",
+    "express"
+  ],
+  "author": "Shree Sai Classes",
+  "license": "ISC"
+}
