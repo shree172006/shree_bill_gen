@@ -3,18 +3,34 @@ import { v4 as uuidv4 } from 'uuid';
 import { Store } from '../models/store.js';
 import { isMatchingSection } from './studentController.js';
 
-// Format Date helper
+// Format Date helper with Excel serial number support
 const formatDateVal = (dateStr) => {
   if (!dateStr) return '';
   try {
+    const num = Number(dateStr);
+    if (!isNaN(num) && num > 30000 && num < 65000) {
+      const excelEpoch = new Date(Date.UTC(1899, 11, 30));
+      const jsDate = new Date(excelEpoch.getTime() + num * 86400000);
+      const day = String(jsDate.getUTCDate()).padStart(2, '0');
+      const month = String(jsDate.getUTCMonth() + 1).padStart(2, '0');
+      const year = jsDate.getUTCFullYear();
+      return `${day}/${month}/${year}`;
+    }
+
+    if (typeof dateStr === 'string' && /^\d{2}\/\d{2}\/\d{4}/.test(dateStr)) {
+      return dateStr;
+    }
+
     const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return dateStr;
+    if (isNaN(d.getTime())) return String(dateStr);
+    if (d.getFullYear() > 2099) return '';
+
     const day = String(d.getDate()).padStart(2, '0');
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const year = d.getFullYear();
     return `${day}/${month}/${year}`;
   } catch (_) {
-    return dateStr;
+    return String(dateStr);
   }
 };
 

@@ -29,32 +29,54 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
     if (!receiptRef.current) return null;
     const element = receiptRef.current;
 
-    // Dynamic lazy-load for instant performance & zero lag
+    // Dynamically load html2canvas & jsPDF for instant performance
     const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
       import('html2canvas'),
       import('jspdf'),
     ]);
 
+    // Give browser a tick to paint loading spinner
+    await new Promise((resolve) => setTimeout(resolve, 60));
+
     const canvas = await html2canvas(element, {
-      scale: 2.5,
+      scale: 2,
       useCORS: true,
       logging: false,
       backgroundColor: '#ffffff',
+      scrollX: 0,
+      scrollY: -window.scrollY,
+      windowWidth: document.documentElement.offsetWidth,
+      height: element.scrollHeight,
+      width: element.offsetWidth,
     });
 
-    const imgData = canvas.toDataURL('image/jpeg', 1.0);
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
       format: 'a4',
+      compress: true,
     });
 
     const pageWidth = 210;
-    const margin = 10;
-    const imgWidth = pageWidth - margin * 2;
+    const pageHeight = 297;
+    const margin = 8;
+    const maxPrintWidth = pageWidth - margin * 2;
+    const maxPrintHeight = pageHeight - margin * 2;
+
+    const imgWidth = maxPrintWidth;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-    pdf.addImage(imgData, 'JPEG', margin, margin, imgWidth, imgHeight);
+    // Scale to fit precisely on single A4 sheet without cutting off bottom
+    if (imgHeight > maxPrintHeight) {
+      const scaleRatio = maxPrintHeight / imgHeight;
+      const scaledWidth = imgWidth * scaleRatio;
+      const scaledHeight = maxPrintHeight;
+      const offsetX = margin + (maxPrintWidth - scaledWidth) / 2;
+      pdf.addImage(imgData, 'JPEG', offsetX, margin, scaledWidth, scaledHeight);
+    } else {
+      pdf.addImage(imgData, 'JPEG', margin, margin, imgWidth, imgHeight);
+    }
 
     return {
       blob: pdf.output('blob'),
@@ -71,7 +93,7 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
         result.pdfInstance.save(result.fileName);
       }
     } catch (err) {
-      console.error('PDF generation failed:', err);
+      console.error('PDF generation error:', err);
       window.print();
     } finally {
       setIsGenerating(false);
@@ -88,7 +110,7 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
         type: 'application/pdf',
       });
 
-      // If mobile browser supports direct file sharing (Android / iOS)
+      // If mobile browser supports direct file sharing (WhatsApp / Chat apps)
       if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
         await navigator.share({
           files: [pdfFile],
@@ -96,13 +118,12 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
           text: `Official Fee Receipt for ${student.studentName} (${settings?.instituteName || 'Shree Sai Classes'})`,
         });
       } else {
-        // Fallback for desktop: save PDF & open WhatsApp
         result.pdfInstance.save(result.fileName);
         handleWhatsAppTextShare();
       }
     } catch (err) {
       if (err.name !== 'AbortError') {
-        console.error('Share failed:', err);
+        console.error('Share error:', err);
         handleWhatsAppTextShare();
       }
     } finally {
@@ -111,7 +132,7 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
   };
 
   const handleWhatsAppTextShare = () => {
-    const text = `*OFFICIAL FEE RECEIPT - ${settings?.instituteName || 'SHREE SAI CLASSES'}*\n\nStudent: *${student.studentName}*\nReceipt No: *${student.receiptNo}*\nCourse: ${student.courseName}\nTotal Fees: ${formatCurrency(student.grandTotal)}\nAmount Paid: ${formatCurrency(student.totalPaid)}\n*Outstanding Balance: ${formatCurrency(student.balanceLeft)}*\nStatus: *${student.status}*\n\n_Thank you for choosing Shree Sai Classes!_`;
+    const text = `*OFFICIAL FEE RECEIPT - ${settings?.instituteName || 'SHREE SAI CLASSES'}*\n\nStudent: *${student.studentName}*\nReceipt No: *${student.receiptNo}*\nStandard: ${student.standard}\nTotal Fees: ${formatCurrency(student.grandTotal)}\nAmount Paid: ${formatCurrency(student.totalPaid)}\n*Outstanding Balance: ${formatCurrency(student.balanceLeft)}*\nStatus: *${student.status}*\n\n_Thank you for choosing Shree Sai Classes!_`;
     const cleanPhone = (student.contactNo || student.parentContact || '').replace(/[^0-9]/g, '');
 
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -138,13 +159,13 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[96vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in duration-150 my-auto">
-        {/* Modal Controls Header */}
+    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto print:p-0 print:bg-white print:static">
+      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[96vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in duration-150 my-auto print:max-w-none print:max-h-none print:shadow-none print:border-none print:rounded-none">
+        {/* Modal Controls Header (Hidden on Print) */}
         <div className="px-4 sm:px-6 py-3 border-b border-slate-200 bg-slate-100 flex items-center justify-between no-print shrink-0">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-800 text-sm">Fee Receipt Preview</span>
-            <span className="text-xs font-mono font-bold text-blue-900 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+            <span className="font-bold text-slate-800 text-xs sm:text-sm">Fee Receipt Preview</span>
+            <span className="text-[11px] font-mono font-bold text-blue-900 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
               {student.receiptNo}
             </span>
           </div>
@@ -182,7 +203,11 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
               className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 text-xs font-bold text-blue-900 bg-blue-100 hover:bg-blue-200 border border-blue-300 rounded-lg transition-colors active:scale-95 disabled:opacity-50"
               title="Download PDF Receipt"
             >
-              <Download className="h-3.5 w-3.5" />
+              {isGenerating ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Download className="h-3.5 w-3.5" />
+              )}
               <span className="hidden sm:inline">Save PDF</span>
             </button>
 
@@ -206,46 +231,46 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
         </div>
 
         {/* Printable Receipt Paper Container */}
-        <div className="p-3 sm:p-6 overflow-y-auto bg-slate-100 flex-1">
+        <div className="p-3 sm:p-5 overflow-y-auto bg-slate-100 flex-1 print:p-0 print:bg-white print:overflow-visible">
           <div
             id="printable-receipt"
             ref={receiptRef}
-            className="bg-white max-w-2xl mx-auto p-5 sm:p-7 rounded-xl border border-slate-300 shadow-md font-['Plus_Jakarta_Sans',sans-serif] text-slate-800 relative text-xs"
+            className="bg-white max-w-xl mx-auto p-4 sm:p-6 rounded-xl border border-slate-300 shadow-md font-['Plus_Jakarta_Sans',sans-serif] text-slate-800 relative text-xs print:border-none print:shadow-none print:max-w-none print:p-0"
           >
             {/* Academy Crest & Header Banner */}
-            <div className="flex items-start justify-between border-b-2 border-blue-950 pb-4 mb-4 gap-4">
-              <div className="flex items-start gap-3.5">
-                <div className="h-14 w-14 rounded-xl bg-blue-950 p-1 flex items-center justify-center border-2 border-red-600 shadow-md shrink-0">
-                  <GraduationCap className="h-9 w-9 text-amber-300" />
+            <div className="flex items-start justify-between border-b-2 border-blue-950 pb-3 mb-3 gap-3">
+              <div className="flex items-start gap-3">
+                <div className="h-12 w-12 rounded-xl bg-blue-950 p-1 flex items-center justify-center border-2 border-red-600 shadow-sm shrink-0">
+                  <GraduationCap className="h-7 w-7 text-amber-300" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-black text-blue-950 font-heading tracking-tight leading-none">
+                  <h1 className="text-xl font-black text-blue-950 font-heading tracking-tight leading-none">
                     {settings?.instituteName || 'SHREE SAI CLASSES'}
                   </h1>
-                  <p className="text-xs font-bold text-red-600 mt-1">
+                  <p className="text-[11px] font-bold text-red-600 mt-0.5">
                     {settings?.tagline || 'A Choice of Better Life...! | Hard Work + Quality = Success'}
                   </p>
-                  <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+                  <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">
                     {settings?.address || 'Shiv Dham Society No. 5, Opp. BMC Colony, M. D. Nagar, Nallasopara (E)'}
                   </p>
-                  <p className="text-[11px] text-slate-600 font-semibold mt-0.5">
+                  <p className="text-[10px] text-slate-600 font-semibold mt-0.5">
                     Student's Care No.: {settings?.phone || '+91 7378756695 / +91 7378756653'}
                   </p>
                 </div>
               </div>
 
               <div className="text-right shrink-0">
-                <span className="inline-block px-3 py-1 bg-red-600 text-white font-black text-xs uppercase tracking-widest rounded shadow-xs">
+                <span className="inline-block px-2.5 py-0.5 bg-red-600 text-white font-black text-[11px] uppercase tracking-wider rounded">
                   FEE RECEIPT
                 </span>
-                <p className="text-xs font-mono font-bold text-blue-950 mt-1.5">
+                <p className="text-xs font-mono font-bold text-blue-950 mt-1">
                   {student.receiptNo}
                 </p>
               </div>
             </div>
 
             {/* Receipt Meta Date Header */}
-            <div className="flex items-center justify-between text-xs text-slate-600 mb-4 bg-slate-50 px-3.5 py-2 rounded-lg border border-slate-200">
+            <div className="flex items-center justify-between text-[11px] text-slate-600 mb-3 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
               <div>
                 <span className="text-slate-500">Admission Date: </span>
                 <span className="font-bold text-slate-800">{formatDate(student.admissionDate)}</span>
@@ -257,106 +282,106 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
             </div>
 
             {/* Student & Course Details Grid */}
-            <div className="bg-slate-50 rounded-xl p-4 border border-slate-200 mb-5">
-              <div className="grid grid-cols-2 gap-y-3 gap-x-6 text-xs">
+            <div className="bg-slate-50 rounded-xl p-3 border border-slate-200 mb-3.5">
+              <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-xs">
                 <div>
-                  <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-500">Student Full Name</span>
-                  <span className="text-sm font-black text-blue-950">{student.studentName}</span>
+                  <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-500">Student Full Name</span>
+                  <span className="text-xs font-black text-blue-950">{student.studentName}</span>
                 </div>
 
                 <div>
-                  <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-500">Academic Year</span>
+                  <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-500">Academic Year</span>
                   <span className="font-bold text-slate-900 text-xs">{student.academicYear || '2024-25'}</span>
                 </div>
 
                 <div>
-                  <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-500">Standard / Class</span>
-                  <span className="font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded border border-red-200 inline-block mt-0.5 text-xs">
+                  <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-500">Standard / Class</span>
+                  <span className="font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded border border-red-200 inline-block text-[11px]">
                     {student.standard}
                   </span>
                 </div>
 
                 <div>
-                  <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-500">Contact Number</span>
+                  <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-500">Contact Number</span>
                   <span className="font-bold text-slate-900 text-xs">{student.contactNo || student.parentContact || '-'}</span>
                 </div>
 
                 <div className="col-span-2">
-                  <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-500">Course & Subject Package</span>
+                  <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-500">Course & Subject Package</span>
                   <span className="font-bold text-slate-900 text-xs">{student.courseName}</span>
                 </div>
               </div>
             </div>
 
             {/* Financial Breakdown Table */}
-            <div className="mb-5">
-              <div className="bg-blue-950 text-white px-3.5 py-2 text-xs font-bold uppercase tracking-wider rounded-t-lg flex justify-between">
+            <div className="mb-3.5">
+              <div className="bg-blue-950 text-white px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-t-lg flex justify-between">
                 <span>Fee Particulars</span>
                 <span>Amount (₹)</span>
               </div>
               <div className="border-x border-b border-slate-200 divide-y divide-slate-100 text-xs rounded-b-lg overflow-hidden bg-white">
-                <div className="flex justify-between px-3.5 py-2.5">
+                <div className="flex justify-between px-3 py-2">
                   <span className="font-medium text-slate-700">Course Tuition & Study Material Fees</span>
                   <span className="font-bold text-slate-900">{formatCurrency(student.totalFees)}</span>
                 </div>
                 {student.discount > 0 && (
-                  <div className="flex justify-between px-3.5 py-2 bg-emerald-50/60">
+                  <div className="flex justify-between px-3 py-1.5 bg-emerald-50/60">
                     <span className="font-semibold text-emerald-800">Special Scholarship / Discount Concession</span>
                     <span className="font-bold text-emerald-700">- {formatCurrency(student.discount)}</span>
                   </div>
                 )}
-                <div className="flex justify-between px-3.5 py-2.5 bg-slate-100 font-bold text-slate-900">
+                <div className="flex justify-between px-3 py-2 bg-slate-100 font-bold text-slate-900">
                   <span>Net Payable Grand Total</span>
-                  <span className="text-sm font-black text-blue-950">{formatCurrency(student.grandTotal)}</span>
+                  <span className="text-xs font-black text-blue-950">{formatCurrency(student.grandTotal)}</span>
                 </div>
               </div>
             </div>
 
             {/* Paid Installments Payment Table (ONLY PAID RECORDS) */}
-            <div className="mb-5">
-              <div className="bg-slate-800 text-white px-3.5 py-2 text-xs font-bold uppercase tracking-wider rounded-t-lg flex justify-between items-center">
+            <div className="mb-3.5">
+              <div className="bg-slate-800 text-white px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-t-lg flex justify-between items-center">
                 <span>Payment & Receipts Breakdown</span>
-                <span className="text-[11px] text-emerald-300 font-semibold flex items-center gap-1">
+                <span className="text-[10px] text-emerald-300 font-semibold flex items-center gap-1">
                   <CheckCircle2 className="h-3 w-3" />
-                  {paidInstallments.length} Payment(s) Cleared
+                  {paidInstallments.length} Cleared
                 </span>
               </div>
               <div className="border-x border-b border-slate-200 rounded-b-lg overflow-hidden bg-white">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-100 text-[10px] font-bold text-slate-600 uppercase border-b border-slate-200">
+                  <thead className="bg-slate-100 text-[9px] font-bold text-slate-600 uppercase border-b border-slate-200">
                     <tr>
-                      <th className="px-3.5 py-2">Installment</th>
-                      <th className="px-3.5 py-2">Payment Date</th>
-                      <th className="px-3.5 py-2">Payment Mode</th>
-                      <th className="px-3.5 py-2 text-right">Amount Paid</th>
+                      <th className="px-3 py-1.5">Installment</th>
+                      <th className="px-3 py-1.5">Payment Date</th>
+                      <th className="px-3 py-1.5">Payment Mode</th>
+                      <th className="px-3 py-1.5 text-right">Amount Paid</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {paidInstallments.length > 0 ? (
                       paidInstallments.map((inst, idx) => (
                         <tr key={idx} className="bg-emerald-50/30">
-                          <td className="px-3.5 py-2.5 font-bold text-slate-800">
+                          <td className="px-3 py-1.5 font-bold text-slate-800">
                             Installment #{inst.srNo}
                           </td>
-                          <td className="px-3.5 py-2.5 text-slate-700 font-medium">
+                          <td className="px-3 py-1.5 text-slate-700 font-medium text-[11px]">
                             {formatDate(inst.paidDate || inst.dueDate)}
                           </td>
-                          <td className="px-3.5 py-2.5 text-slate-800 font-semibold">
+                          <td className="px-3 py-1.5 text-slate-800 font-semibold text-[11px]">
                             {inst.paymentMode || 'Cash'}
                             {inst.transactionDetails && inst.transactionDetails !== 'Cash' && inst.transactionDetails !== 'Counter Payment' && (
-                              <span className="block text-[10px] text-slate-500 font-normal">
+                              <span className="block text-[9px] text-slate-500 font-normal">
                                 {inst.transactionDetails}
                               </span>
                             )}
                           </td>
-                          <td className="px-3.5 py-2.5 text-right font-black text-emerald-700">
+                          <td className="px-3 py-1.5 text-right font-black text-emerald-700">
                             {formatCurrency(inst.amount)}
                           </td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={4} className="px-3.5 py-4 text-center text-slate-400 font-medium italic">
+                        <td colSpan={4} className="px-3 py-3 text-center text-slate-400 font-medium italic text-[11px]">
                           No payments cleared yet.
                         </td>
                       </tr>
@@ -367,15 +392,15 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
             </div>
 
             {/* Total Collected & Outstanding Balance Due Box */}
-            <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-4 rounded-xl border border-slate-300 flex items-center justify-between mb-5 text-xs">
+            <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-3 rounded-xl border border-slate-300 flex items-center justify-between mb-3.5 text-xs">
               <div>
-                <span className="block text-[11px] font-bold uppercase text-slate-500">Total Fees Collected</span>
-                <span className="text-lg font-black text-emerald-700">{formatCurrency(student.totalPaid)}</span>
+                <span className="block text-[10px] font-bold uppercase text-slate-500">Total Fees Collected</span>
+                <span className="text-base font-black text-emerald-700">{formatCurrency(student.totalPaid)}</span>
               </div>
               <div className="text-right">
-                <span className="block text-[11px] font-bold uppercase text-slate-500">Outstanding Balance Due</span>
+                <span className="block text-[10px] font-bold uppercase text-slate-500">Outstanding Balance Due</span>
                 <span
-                  className={`text-lg font-black ${
+                  className={`text-base font-black ${
                     student.balanceLeft > 0 ? 'text-red-700' : 'text-emerald-600'
                   }`}
                 >
@@ -385,8 +410,8 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
             </div>
 
             {/* Terms and Conditions */}
-            <div className="mb-6 text-[10px] text-slate-500 space-y-1 border-t border-slate-200 pt-3">
-              <p className="font-bold text-slate-700 uppercase tracking-wider mb-1">Terms & Conditions:</p>
+            <div className="mb-4 text-[9px] text-slate-500 space-y-0.5 border-t border-slate-200 pt-2 leading-tight">
+              <p className="font-bold text-slate-700 uppercase tracking-wider">Terms & Conditions:</p>
               {(settings?.terms || [
                 '1. The receipt is subject to realisation of payment.',
                 '2. This receipt should be carefully preserved and must be produced on demand.',
@@ -397,13 +422,13 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
             </div>
 
             {/* Signature Block */}
-            <div className="flex justify-end pt-6 border-t border-dashed border-slate-300 text-xs">
+            <div className="flex justify-end pt-3 border-t border-dashed border-slate-300 text-xs">
               <div className="text-center">
-                <div className="text-[10px] font-bold text-blue-950 uppercase tracking-wider mb-8">
+                <div className="text-[9px] font-bold text-blue-950 uppercase tracking-wider mb-6">
                   For {settings?.instituteName || 'SHREE SAI CLASSES'}
                 </div>
-                <div className="w-44 border-b border-slate-400 mb-1" />
-                <span className="text-[11px] font-bold text-slate-600">Authorized Signatory</span>
+                <div className="w-36 border-b border-slate-400 mb-1" />
+                <span className="text-[10px] font-bold text-slate-600">Authorized Signatory</span>
               </div>
             </div>
           </div>
