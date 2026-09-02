@@ -42,7 +42,7 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
     const rowsHTML = inst.length > 0
       ? inst.map((i, idx) => `
           <tr style="background:${idx % 2 === 0 ? '#f0fdf4' : '#ffffff'}">
-            <td style="padding:7px 10px;font-weight:700;color:#1e293b;font-size:11px;border-bottom:1px solid #e2e8f0">Installment #${i.srNo}</td>
+            <td style="padding:7px 10px;font-weight:700;color:#1e293b;font-size:11px;border-bottom:1px solid #e2e8f0">Installment</td>
             <td style="padding:7px 10px;color:#475569;font-size:11px;border-bottom:1px solid #e2e8f0">${formatDate(i.paidDate || i.dueDate)}</td>
             <td style="padding:7px 10px;color:#1e293b;font-weight:600;font-size:11px;border-bottom:1px solid #e2e8f0">${i.paymentMode || 'Cash'}</td>
             <td style="padding:7px 10px;text-align:right;font-weight:900;color:#15803d;font-size:11px;border-bottom:1px solid #e2e8f0">${formatCurrency(i.amount)}</td>
@@ -571,7 +571,7 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
                       paidInstallments.map((inst, idx) => (
                         <tr key={idx} className="bg-emerald-50/30">
                           <td className="px-3 py-1.5 font-bold text-slate-800">
-                            Installment #{inst.srNo}
+                            Installment
                           </td>
                           <td className="px-3 py-1.5 text-slate-700 font-medium text-[11px]">
                             {formatDate(inst.paidDate || inst.dueDate)}
