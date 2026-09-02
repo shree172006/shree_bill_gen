@@ -25,82 +25,267 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
     window.print();
   };
 
-  const generatePDFBlob = async () => {
-    if (!receiptRef.current) return null;
-    const element = receiptRef.current;
+  const buildReceiptHTML = () => {
+    const inst = paidInstallments;
+    const todayStr = formatDate(new Date());
+    const admDate = formatDate(student.admissionDate);
+    const instituteName = settings?.instituteName || 'SHREE SAI CLASSES';
+    const tagline = settings?.tagline || 'A Choice of Better Life...! | Hard Work + Quality = Success';
+    const address = settings?.address || 'Shiv Dham Society No. 5, Opp. BMC Colony, M. D. Nagar, Nallasopara (E)';
+    const phone = settings?.phone || '+91 7378756695 / +91 7378756653';
+    const terms = settings?.terms || [
+      '1. The receipt is subject to realisation of payment.',
+      '2. This receipt should be carefully preserved and must be produced on demand.',
+      '3. Fees once paid are strictly non-refundable and non-transferable under any circumstances.',
+    ];
 
+    const rowsHTML = inst.length > 0
+      ? inst.map((i, idx) => `
+          <tr style="background:${idx % 2 === 0 ? '#f0fdf4' : '#ffffff'}">
+            <td style="padding:7px 10px;font-weight:700;color:#1e293b;font-size:11px;border-bottom:1px solid #e2e8f0">Installment #${i.srNo}</td>
+            <td style="padding:7px 10px;color:#475569;font-size:11px;border-bottom:1px solid #e2e8f0">${formatDate(i.paidDate || i.dueDate)}</td>
+            <td style="padding:7px 10px;color:#1e293b;font-weight:600;font-size:11px;border-bottom:1px solid #e2e8f0">${i.paymentMode || 'Cash'}</td>
+            <td style="padding:7px 10px;text-align:right;font-weight:900;color:#15803d;font-size:11px;border-bottom:1px solid #e2e8f0">${formatCurrency(i.amount)}</td>
+          </tr>`).join('')
+      : `<tr><td colspan="4" style="padding:14px;text-align:center;color:#94a3b8;font-style:italic;font-size:11px">No payments cleared yet.</td></tr>`;
+
+    const discountRow = student.discount > 0
+      ? `<div style="display:flex;justify-content:space-between;padding:8px 12px;background:#ecfdf5;border-bottom:1px solid #e2e8f0">
+           <span style="font-weight:600;color:#065f46;font-size:11px">Special Scholarship / Discount Concession</span>
+           <span style="font-weight:700;color:#059669;font-size:11px">- ${formatCurrency(student.discount)}</span>
+         </div>` : '';
+
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#fff;color:#1e293b;font-size:12px;line-height:1.4}
+  h1{font-size:22px;font-weight:900;color:#172554;letter-spacing:-0.5px}
+</style>
+</head>
+<body style="padding:28px 32px;width:800px">
+  <!-- Header -->
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #172554;padding-bottom:14px;margin-bottom:14px">
+    <div style="display:flex;align-items:flex-start;gap:14px">
+      <div style="width:52px;height:52px;background:#172554;border-radius:10px;border:2px solid #dc2626;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fcd34d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
+        </svg>
+      </div>
+      <div>
+        <h1>${instituteName}</h1>
+        <p style="font-size:11px;font-weight:700;color:#dc2626;margin-top:3px">${tagline}</p>
+        <p style="font-size:10px;color:#64748b;margin-top:3px">${address}</p>
+        <p style="font-size:10px;font-weight:600;color:#475569;margin-top:2px">Student's Care No.: ${phone}</p>
+      </div>
+    </div>
+    <div style="text-align:right;flex-shrink:0">
+      <div style="background:#dc2626;color:#fff;font-weight:900;font-size:11px;letter-spacing:1px;padding:4px 10px;border-radius:4px;text-transform:uppercase">FEE RECEIPT</div>
+      <p style="font-size:12px;font-weight:700;font-family:monospace;color:#172554;margin-top:5px">${student.receiptNo}</p>
+    </div>
+  </div>
+
+  <!-- Dates -->
+  <div style="display:flex;justify-content:space-between;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 14px;margin-bottom:14px;font-size:11px;color:#475569">
+    <div><span>Admission Date: </span><strong style="color:#1e293b">${admDate}</strong></div>
+    <div><span>Receipt Issue Date: </span><strong style="color:#1e293b">${todayStr}</strong></div>
+  </div>
+
+  <!-- Student Details -->
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:14px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div>
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;margin-bottom:2px">Student Full Name</div>
+        <div style="font-size:13px;font-weight:900;color:#172554">${student.studentName}</div>
+      </div>
+      <div>
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;margin-bottom:2px">Academic Year</div>
+        <div style="font-size:12px;font-weight:700;color:#1e293b">${student.academicYear || '2026-27'}</div>
+      </div>
+      <div>
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;margin-bottom:2px">Standard / Class</div>
+        <div style="display:inline-block;background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700">${student.standard}</div>
+      </div>
+      <div>
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;margin-bottom:2px">Contact Number</div>
+        <div style="font-size:12px;font-weight:700;color:#1e293b">${student.contactNo || student.parentContact || '-'}</div>
+      </div>
+      <div style="grid-column:1/-1">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;margin-bottom:2px">Course &amp; Subject Package</div>
+        <div style="font-size:12px;font-weight:700;color:#1e293b">${student.courseName}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fee Particulars -->
+  <div style="margin-bottom:14px">
+    <div style="background:#172554;color:#fff;padding:8px 12px;border-radius:8px 8px 0 0;display:flex;justify-content:space-between;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px">
+      <span>Fee Particulars</span><span>Amount (₹)</span>
+    </div>
+    <div style="border:1px solid #e2e8f0;border-top:none;border-radius:0 0 8px 8px;overflow:hidden">
+      <div style="display:flex;justify-content:space-between;padding:9px 12px;border-bottom:1px solid #f1f5f9">
+        <span style="font-size:11px;color:#475569">Course Tuition &amp; Study Material Fees</span>
+        <span style="font-size:11px;font-weight:700;color:#1e293b">${formatCurrency(student.totalFees)}</span>
+      </div>
+      ${discountRow}
+      <div style="display:flex;justify-content:space-between;padding:9px 12px;background:#f1f5f9">
+        <span style="font-size:11px;font-weight:700;color:#1e293b">Net Payable Grand Total</span>
+        <span style="font-size:13px;font-weight:900;color:#172554">${formatCurrency(student.grandTotal)}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Table -->
+  <div style="margin-bottom:14px">
+    <div style="background:#1e293b;color:#fff;padding:8px 12px;border-radius:8px 8px 0 0;display:flex;justify-content:space-between;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px">
+      <span>Payment &amp; Receipts Breakdown</span>
+      <span style="color:#6ee7b7;font-size:10px">${inst.length} Cleared</span>
+    </div>
+    <div style="border:1px solid #e2e8f0;border-top:none;border-radius:0 0 8px 8px;overflow:hidden">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="background:#f1f5f9">
+            <th style="padding:7px 10px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;border-bottom:1px solid #e2e8f0">Installment</th>
+            <th style="padding:7px 10px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;border-bottom:1px solid #e2e8f0">Payment Date</th>
+            <th style="padding:7px 10px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;border-bottom:1px solid #e2e8f0">Payment Mode</th>
+            <th style="padding:7px 10px;text-align:right;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;border-bottom:1px solid #e2e8f0">Amount Paid</th>
+          </tr>
+        </thead>
+        <tbody>${rowsHTML}</tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Balance Summary -->
+  <div style="display:flex;justify-content:space-between;background:linear-gradient(to right,#eff6ff,#fff,#fef2f2);border:1px solid #cbd5e1;border-radius:10px;padding:14px 18px;margin-bottom:14px">
+    <div>
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;margin-bottom:3px">Total Fees Collected</div>
+      <div style="font-size:20px;font-weight:900;color:#15803d">${formatCurrency(student.totalPaid)}</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;margin-bottom:3px">Outstanding Balance Due</div>
+      <div style="font-size:20px;font-weight:900;color:${student.balanceLeft > 0 ? '#b91c1c' : '#15803d'}">${formatCurrency(student.balanceLeft)}</div>
+    </div>
+  </div>
+
+  <!-- Terms -->
+  <div style="border-top:1px solid #e2e8f0;padding-top:10px;margin-bottom:18px">
+    <p style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#475569;margin-bottom:4px">Terms &amp; Conditions:</p>
+    ${terms.map(t => `<p style="font-size:9px;color:#64748b;line-height:1.5">${t}</p>`).join('')}
+  </div>
+
+  <!-- Signature -->
+  <div style="display:flex;justify-content:flex-end;border-top:1px dashed #cbd5e1;padding-top:14px">
+    <div style="text-align:center">
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#172554;margin-bottom:32px">For ${instituteName}</div>
+      <div style="width:160px;border-bottom:1px solid #94a3b8;margin-bottom:5px"></div>
+      <div style="font-size:10px;font-weight:700;color:#475569">Authorized Signatory</div>
+    </div>
+  </div>
+</body>
+</html>`;
+  };
+
+  const generatePDFBlob = async () => {
     // Dynamically load html2canvas & jsPDF
     const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
       import('html2canvas'),
       import('jspdf'),
     ]);
 
-    // Give browser a tick to paint loading spinner
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 30));
 
-    // Create an isolated fixed-dimension A4 clone (720px desktop width)
-    // This guarantees the PDF is NEVER distorted or squished by mobile phone screens!
-    const clone = element.cloneNode(true);
-    clone.id = 'printable-receipt-a4-render';
-    clone.style.width = '720px';
-    clone.style.minWidth = '720px';
-    clone.style.maxWidth = '720px';
-    clone.style.position = 'absolute';
-    clone.style.left = '-9999px';
-    clone.style.top = '0px';
-    clone.style.margin = '0';
-    clone.style.padding = '24px';
-    clone.style.boxSizing = 'border-box';
-    clone.style.backgroundColor = '#ffffff';
-    clone.style.borderRadius = '0px';
-    clone.style.border = 'none';
-    clone.style.boxShadow = 'none';
-    document.body.appendChild(clone);
+    // Inject a hidden iframe with self-contained inline-styled HTML.
+    // This approach is 100% device-independent — the PDF NEVER reflects the phone's screen width.
+    const iframe = document.createElement('iframe');
+    iframe.setAttribute('aria-hidden', 'true');
+    Object.assign(iframe.style, {
+      position: 'fixed',
+      top: '-9999px',
+      left: '-9999px',
+      width: '800px',
+      height: '1400px',
+      border: 'none',
+      visibility: 'hidden',
+    });
+    document.body.appendChild(iframe);
 
     let canvas;
     try {
-      canvas = await html2canvas(clone, {
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+      iframeDoc.open();
+      iframeDoc.write(buildReceiptHTML());
+      iframeDoc.close();
+
+      // Wait for iframe to finish rendering fonts / layout
+      await new Promise((resolve) => setTimeout(resolve, 250));
+
+      const body = iframeDoc.body;
+      const docHeight = body.scrollHeight || 1200;
+
+      iframe.style.height = `${docHeight + 40}px`;
+
+      // Allow layout reflow for the new height
+      await new Promise((resolve) => setTimeout(resolve, 80));
+
+      canvas = await html2canvas(body, {
         scale: 2,
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
-        width: 720,
-        windowWidth: 720,
+        width: 800,
+        windowWidth: 800,
+        scrollX: 0,
+        scrollY: 0,
       });
     } finally {
-      if (document.body.contains(clone)) {
-        document.body.removeChild(clone);
+      if (document.body.contains(iframe)) {
+        document.body.removeChild(iframe);
       }
     }
 
     if (!canvas) return null;
 
-    const imgData = canvas.toDataURL('image/jpeg', 0.95);
-    const pdf = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: 'a4',
-      compress: true,
-    });
+    const imgData = canvas.toDataURL('image/jpeg', 0.96);
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
 
     const pageWidth = 210;
     const pageHeight = 297;
     const margin = 8;
-    const maxPrintWidth = pageWidth - margin * 2; // 194mm
-    const maxPrintHeight = pageHeight - margin * 2; // 281mm
+    const usableW = pageWidth - margin * 2;  // 194mm
+    const usableH = pageHeight - margin * 2; // 281mm
 
-    const imgWidth = maxPrintWidth;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    const renderedH = (canvas.height * usableW) / canvas.width;
 
-    // Scale to fit precisely on single A4 sheet without cutting off bottom
-    if (imgHeight > maxPrintHeight) {
-      const scaleRatio = maxPrintHeight / imgHeight;
-      const scaledWidth = imgWidth * scaleRatio;
-      const scaledHeight = maxPrintHeight;
-      const offsetX = margin + (maxPrintWidth - scaledWidth) / 2;
-      pdf.addImage(imgData, 'JPEG', offsetX, margin, scaledWidth, scaledHeight);
+    if (renderedH <= usableH) {
+      // Content fits on one page — place it directly
+      pdf.addImage(imgData, 'JPEG', margin, margin, usableW, renderedH);
     } else {
-      pdf.addImage(imgData, 'JPEG', margin, margin, imgWidth, imgHeight);
+      // Content taller than A4: tile across multiple pages
+      const pageImgH = (usableH * canvas.width) / usableW;
+      let remainingH = canvas.height;
+      let srcY = 0;
+      let isFirstPage = true;
+
+      while (remainingH > 0) {
+        const sliceH = Math.min(pageImgH, remainingH);
+        const sliceCanvas = document.createElement('canvas');
+        sliceCanvas.width = canvas.width;
+        sliceCanvas.height = sliceH;
+        sliceCanvas.getContext('2d').drawImage(canvas, 0, srcY, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+        const sliceData = sliceCanvas.toDataURL('image/jpeg', 0.96);
+        const sliceRenderH = (sliceH * usableW) / canvas.width;
+
+        if (!isFirstPage) pdf.addPage();
+        pdf.addImage(sliceData, 'JPEG', margin, margin, usableW, sliceRenderH);
+
+        srcY += sliceH;
+        remainingH -= sliceH;
+        isFirstPage = false;
+      }
     }
 
     return {
