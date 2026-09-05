@@ -20,6 +20,14 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
     (i) => i.status === 'PAID'
   );
 
+  const pendingInstallments = (student.installments || []).filter(
+    (i) => i.status !== 'PAID'
+  );
+  const nextPending = pendingInstallments[0];
+  const nextDueDateRaw = nextPending?.dueDate || student.dueDate || student.nextDueDate;
+  const nextDueDateVal = nextDueDateRaw ? formatDate(nextDueDateRaw) : null;
+  const formattedNextDue = (nextDueDateVal && nextDueDateVal !== '-') ? nextDueDateVal : null;
+
   const latestPaid = paidInstallments.length > 0 ? paidInstallments[paidInstallments.length - 1] : null;
   const activeReceiptNo = latestPaid?.receiptNo || (student.receiptNo ? `${student.receiptNo}-01` : 'SSC-REC-001-01');
 
@@ -149,10 +157,6 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
         <td style="padding:8px 12px;font-size:11px;color:#94a3b8;border-bottom:1px solid #e2e8f0">—</td>
         <td style="padding:8px 12px;font-size:11px;font-weight:800;color:#059669;text-align:right;border-bottom:1px solid #e2e8f0">- ${formatCurrency(student.discount)}</td>
       </tr>` : ''}
-      <tr style="background:#f1f5f9">
-        <td colspan="4" style="padding:8px 12px;font-size:11px;font-weight:800;color:#1e3a8a;border-bottom:2px solid #cbd5e1">Net Total Payable Course Fees</td>
-        <td style="padding:8px 12px;font-size:12px;font-weight:900;color:#1e3a8a;text-align:right;border-bottom:2px solid #cbd5e1">${formatCurrency(student.grandTotal)}</td>
-      </tr>
       <!-- Cleared Installment Rows Header -->
       <tr style="background:#e2e8f0">
         <td colspan="5" style="padding:6px 12px;font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:#334155;border-bottom:1px solid #cbd5e1">Installments Paid &amp; Cleared (${inst.length} Cleared)</td>
@@ -174,6 +178,9 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
     <div style="text-align:center">
       <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:${student.balanceLeft > 0 ? '#b91c1c' : '#059669'};margin-bottom:2px">Outstanding Balance Due</div>
       <div style="font-size:18px;font-weight:900;color:${student.balanceLeft > 0 ? '#b91c1c' : '#15803d'}">${student.balanceLeft > 0 ? formatCurrency(student.balanceLeft) : 'NIL (FULLY CLEARED)'}</div>
+      ${student.balanceLeft > 0 && formattedNextDue ? `
+        <div style="font-size:9.5px;font-weight:800;color:#dc2626;margin-top:3px;letter-spacing:0.2px">Next Due: ${formattedNextDue}</div>
+      ` : ''}
     </div>
   </div>
 
@@ -534,10 +541,6 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
                         <td className="px-2.5 sm:px-3 py-1.5 text-right font-bold text-emerald-700">- {formatCurrency(student.discount)}</td>
                       </tr>
                     )}
-                    <tr className="bg-slate-100 font-bold border-b-2 border-slate-300">
-                      <td colSpan={4} className="px-2.5 sm:px-3 py-1.5 text-blue-950 font-black">Net Total Payable Course Fees</td>
-                      <td className="px-2.5 sm:px-3 py-1.5 text-right text-blue-950 font-black text-xs">{formatCurrency(student.grandTotal)}</td>
-                    </tr>
                     <tr className="bg-slate-200/80">
                       <td colSpan={5} className="px-2.5 sm:px-3 py-1 text-[9px] font-black uppercase tracking-wider text-slate-700">
                         Cleared Installment Payments ({paidInstallments.length} Cleared)
@@ -603,6 +606,11 @@ export const ReceiptModal = ({ isOpen, onClose, student, settings }) => {
                 >
                   {student.balanceLeft > 0 ? formatCurrency(student.balanceLeft) : 'NIL'}
                 </span>
+                {student.balanceLeft > 0 && formattedNextDue && (
+                  <span className="block text-[8.5px] sm:text-[9.5px] font-bold text-red-600 mt-0.5 whitespace-nowrap">
+                    Next Due: {formattedNextDue}
+                  </span>
+                )}
               </div>
             </div>
 

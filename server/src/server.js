@@ -12,6 +12,7 @@ import settingRoutes from './routes/settingRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import { connectDB } from './config/db.js';
 import { testSupabaseConnection } from './config/supabase.js';
+import { initKeepAlive } from './utils/keepAlive.js';
 
 dotenv.config();
 
@@ -78,4 +79,5 @@ app.listen(PORT, async () => {
   console.log(`====================================================`);
   await connectDB();
   await testSupabaseConnection();
+  initKeepAlive();
 });

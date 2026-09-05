@@ -161,6 +161,11 @@ export const StudentTable = ({
             const paidCount = (student.installments || []).filter((i) => i.status === 'PAID').length;
             const totalCount = (student.installments || []).length;
             const progressPercent = totalCount > 0 ? Math.round((paidCount / totalCount) * 100) : 0;
+            const pendingInstallments = (student.installments || []).filter((i) => i.status !== 'PAID');
+            const nextPending = pendingInstallments[0];
+            const nextDueRaw = nextPending?.dueDate || student.dueDate || student.nextDueDate;
+            const nextDueVal = nextDueRaw ? formatDate(nextDueRaw) : null;
+            const nextDueStr = (nextDueVal && nextDueVal !== '-') ? nextDueVal : null;
 
             return (
               <div key={student.id} className="p-4 hover:bg-slate-50/80 transition-colors">
@@ -211,6 +216,11 @@ export const StudentTable = ({
                     <span className={`text-xs font-black ${student.balanceLeft > 0 ? 'text-red-700' : 'text-slate-400'}`}>
                       {formatCurrency(student.balanceLeft)}
                     </span>
+                    {student.balanceLeft > 0 && nextDueStr && (
+                      <span className="block text-[8.5px] font-semibold text-red-600 mt-0.5">
+                        Due: {nextDueStr}
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -285,6 +295,11 @@ export const StudentTable = ({
               {students.map((student) => {
                 const paidCount = (student.installments || []).filter((i) => i.status === 'PAID').length;
                 const totalCount = (student.installments || []).length;
+                const pendingInstallments = (student.installments || []).filter((i) => i.status !== 'PAID');
+                const nextPending = pendingInstallments[0];
+                const nextDueRaw = nextPending?.dueDate || student.dueDate || student.nextDueDate;
+                const nextDueVal = nextDueRaw ? formatDate(nextDueRaw) : null;
+                const nextDueStr = (nextDueVal && nextDueVal !== '-') ? nextDueVal : null;
 
                 return (
                   <tr key={student.id} className="hover:bg-slate-50/80 transition-colors">
@@ -359,6 +374,11 @@ export const StudentTable = ({
                       >
                         {formatCurrency(student.balanceLeft)}
                       </span>
+                      {student.balanceLeft > 0 && nextDueStr && (
+                        <span className="block text-[10px] text-red-600 font-medium whitespace-nowrap">
+                          Due: {nextDueStr}
+                        </span>
+                      )}
                     </td>
 
                     {/* Status Badge */}
